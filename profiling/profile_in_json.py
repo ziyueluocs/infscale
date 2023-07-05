@@ -11,7 +11,7 @@ def json_init(obj: dict, name: str):
 def json_add(obj: dict, name: str, val):
     obj[name] = val
 
-def json_dump_model_aggregated_profile(self, module_depth=-1, top_modules=1):
+def json_dump_model_aggregated_profile(output_obj, model, module_depth=-1, top_modules=1):
     """Prints the names of the top top_modules modules in terms of aggregated time, flops, and parameters at depth module_depth.
 
     Args:
@@ -19,7 +19,7 @@ def json_dump_model_aggregated_profile(self, module_depth=-1, top_modules=1):
         top_modules (int, optional): the number of top modules to show. Defaults to 1.
     """
     info = {}
-    if not hasattr(self.model, "__flops__"):
+    if not hasattr(model, "__flops__"):
         print("no __flops__ attribute in the model, call this function after start_profile and before end_profile")
         return
 
@@ -40,7 +40,7 @@ def json_dump_model_aggregated_profile(self, module_depth=-1, top_modules=1):
             for child in module.children():
                 walk_module(child, curr_depth + 1, info)
 
-    walk_module(self.model, 0, info)
+    walk_module(model, 0, info)
 
     depth = module_depth
     if module_depth == -1:
@@ -64,10 +64,28 @@ def json_dump_model_aggregated_profile(self, module_depth=-1, top_modules=1):
             for k, v in sorted(info[d].items(), key=lambda item: item[1][2], reverse=True)[:num_items]
         }
 
-        print(f"depth {d}:")
-        print(f"    params      - {sort_params}")
-        print(f"    MACs        - {sort_macs}")
-        print(f"    fwd latency - {sort_time}")
+        obj = json_init(output_obj, f"depth {d}")
+        json_add(obj, "params", sort_params)
+        json_add(obj, "MACs", sort_macs)
+        json_add(obj, "fwd latency", sort_time)
+
+def model2json(model: torch.nn.Module):
+    """Translate the structure of a NN model to a json object"""
+    json_obj = dict()
+    extra = []
+    extra_repr = model.extra_repr()
+
+    if extra_repr:
+        print(extra_repr)
+        json_obj["extra"] = extra_repr
+    if len(model._modules.items()) > 0:
+        json_obj['children'] = dict()
+        for key, module in model._modules.items():
+            json_obj['children'][key] = model2json(module)
+
+    json_obj["name"] = model._get_name()
+
+    return json_obj
 
 def json_dump_model_profile(model: torch.nn.Module, profiler: FlopsProfiler, profile_step=1, module_depth=-1, top_modules=1, detailed=True, output_file=None):
     """Prints the model graph with the measured profile attached to each module.
@@ -161,26 +179,25 @@ def json_dump_model_profile(model: torch.nn.Module, profiler: FlopsProfiler, pro
     # end of Profile Summary
     json.dump(psas_output, sys.stdout, indent=4)
 
-    def flops_repr(module):
+    def profile_repr(module):
         params = module.__params__ + module.__expert_params__
         flops = get_module_flops(module)
         macs = get_module_macs(module)
-        items = [
-            params_to_string(params),
-            "{:.2%} Params".format(params / total_params if total_params else 0),
-            macs_to_string(macs),
-            "{:.2%} MACs".format(0.0 if total_macs == 0 else macs / total_macs),
-        ]
         duration = get_module_duration(module)
 
-        items.append(duration_to_string(duration))
-        items.append("{:.2%} latency".format(0.0 if total_duration == 0 else duration / total_duration))
-        items.append(flops_to_string(0.0 if duration == 0 else flops / duration))
-        items.append(module.original_extra_repr())
-        return ", ".join(items)
+        profile = dict()
+        profile["params"] = params_to_string(params)
+        profile["percentage of total params"] = "{:.2%}".format(params / total_params if total_params else 0)
+        profile["MACs"] = macs_to_string(macs)
+        profile["percentage of total MACs"] = "{:.2%}".format(0.0 if total_macs == 0 else macs / total_macs)
+        profile["fwd latency"] = duration_to_string(duration)
+        profile["percentage of total fwd latency"] = "{:.2%}".format(0.0 if total_duration == 0 else duration / total_duration)
+        profile["fwd FLOPS"] = flops_to_string(0.0 if duration == 0 else flops / duration)
+
+        return profile
 
     def add_extra_repr(module):
-        flops_extra_repr = flops_repr.__get__(module)
+        flops_extra_repr = profile_repr.__get__(module)
         if module.extra_repr != flops_extra_repr:
             module.original_extra_repr = module.extra_repr
             module.extra_repr = flops_extra_repr
@@ -195,9 +212,11 @@ def json_dump_model_profile(model: torch.nn.Module, profiler: FlopsProfiler, pro
 
     print("\n----------------------------- Aggregated Profile per GPU -----------------------------")
     # beginning of aggregated profile per GPU
-    profiler.print_model_aggregated_profile(module_depth=module_depth, top_modules=top_modules)
+    appg_output = json_init(output, "Aggregated Profile per GPU")
+    json_dump_model_aggregated_profile(appg_output, profiler.model, module_depth=module_depth, top_modules=top_modules)
 
     # end of aggregated profile per GPU
+    json.dump(appg_output, sys.stdout, indent=4)
 
     if detailed:
         print("\n------------------------------ Detailed Profile per GPU ------------------------------")
@@ -207,13 +226,18 @@ def json_dump_model_profile(model: torch.nn.Module, profiler: FlopsProfiler, pro
         print(
             "\nNote: 1. A module can have torch.nn.module or torch.nn.functional to compute logits (e.g. CrossEntropyLoss). They are not counted as submodules, thus not to be printed out. However they make up the difference between a parent's MACs (or latency) and the sum of its submodules'.\n2. Number of floating-point operations is a theoretical estimation, thus FLOPS computed using that could be larger than the maximum system throughput.\n3. The fwd latency listed in the top module's profile is directly captured at the module forward function in PyTorch, thus it's less than the fwd latency shown above which is captured in DeepSpeed.\n"
         )
-        print(profiler.model)
+        # beginning of detailed profile per GPU
+        dppg_output = json_init(output, "Detailed Profile per GPU")
+        dppg_output["root"] = model2json(model)
+        # end of detailed profile per GPU
+        json.dump(dppg_output, sys.stdout, indent=4)
 
     profiler.model.apply(del_extra_repr)
 
     print("------------------------------------------------------------------------------")
 
     if output_file:
+        json.dump(output, f, indent=4)
         f.close()
 
 def get_model_inference_profile(model,
@@ -297,7 +321,7 @@ def get_model_inference_profile(model,
     macs = prof.get_total_macs()
     params = prof.get_total_params()
     if print_profile:
-        prof.print_model_profile(profile_step=warm_up,
+        json_dump_model_profile(model, prof, profile_step=warm_up,
                                  module_depth=module_depth,
                                  top_modules=top_modules,
                                  detailed=detailed,
