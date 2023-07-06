@@ -76,7 +76,6 @@ def model2json(model: torch.nn.Module):
     extra_repr = model.extra_repr()
 
     if extra_repr:
-        print(extra_repr)
         json_obj["extra"] = extra_repr
     if len(model._modules.items()) > 0:
         json_obj['children'] = dict()
@@ -230,7 +229,7 @@ def json_dump_model_profile(model: torch.nn.Module, profiler: FlopsProfiler, pro
         dppg_output = json_init(output, "Detailed Profile per GPU")
         dppg_output["root"] = model2json(model)
         # end of detailed profile per GPU
-        json.dump(dppg_output, sys.stdout, indent=4)
+        print("Only shown in the json file")
 
     profiler.model.apply(del_extra_repr)
 
