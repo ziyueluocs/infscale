@@ -1,6 +1,8 @@
 import json
 import matplotlib.pyplot as plt
 import math
+import random
+import time
 
 def get_leaf_modules(profiling_res: dict) -> list:
     def walk_through_model(model_profile: dict, path: list, leaves: dict()):
@@ -61,6 +63,39 @@ def plot_min_std_dev_curve(leaf_layers, max_num_partition):
     ax = fig.add_subplot(1, 1, 1)
     ax.plot(range(1, max_num_partition + 1), std_dev)
 
+def plot_random_partition_std_dev_curve(leaf_layers, num_partition, num_rounds = 10):
+    latency_arr = [time_str_to_float((v["extra"]["fwd latency"])) for k, v in leaf_layers.items()]
+    m = len(latency_arr)
+    n = num_partition
+    E_x = sum(latency_arr) / m # average latency of partitions is the same as the average latency of all elements
+
+    std_dev = []
+    for j in range(num_rounds):
+        print("{}-th round".format(j))
+        random.seed(time.time())
+        splits = {0, m - 1}
+        while len(splits) < n + 1:
+            k = random.randint(1, m - 1)
+            if k not in splits:
+                splits.add(k)
+
+        splits = sorted(splits)
+        print("splits:", splits)
+        sum_x2 = 0
+        for i in range(len(splits) - 1):
+            print(sum(latency_arr[splits[i]:splits[i+1]]), end=" ")
+            sum_x2 += pow(sum(latency_arr[splits[i]:splits[i+1]]), 2)
+
+        print()
+        temp = math.sqrt((sum_x2 / n) - pow(E_x, 2))
+        print("std_dev:", temp)
+        std_dev.append(temp)
+
+    print(std_dev)
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.plot(range(1, n + 1), std_dev)
+
 if __name__ == "__main__":
     profiling_file = "llama13b_profile.json"
     with open(profiling_file) as pf:
@@ -68,4 +103,5 @@ if __name__ == "__main__":
         max_num_partition = 10
         leaf_layers = get_leaf_modules(profiling_res)
 
-        plot_min_std_dev_curve(leaf_layers, max_num_partition)
+        # plot_min_std_dev_curve(leaf_layers, max_num_partition)
+        plot_random_partition_std_dev_curve(leaf_layers, max_num_partition)
