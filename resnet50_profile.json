@@ -1,0 +1,3621 @@
+{
+    "Profile Summary": {
+        "params per gpu": "25557032",
+        "params of model": "0       ",
+        "fwd MACs per GPU": "1046.83 GMACs",
+        "fwd flops per GPU": "2102.04 G",
+        "fwd flops of model": "2102.04 G",
+        "fwd latency": "11.1 s  ",
+        "fwd FLOPS per GPU": "189.31 GFLOPS"
+    },
+    "Aggregated Profile per GPU": {
+        "depth 0": {
+            "params": {
+                "ResNet": "25.56 M"
+            },
+            "MACs": {
+                "ResNet": "1046.83 GMACs"
+            },
+            "fwd latency": {
+                "ResNet": "11.1 s"
+            }
+        },
+        "depth 1": {
+            "params": {
+                "Sequential": "23.5 M"
+            },
+            "MACs": {
+                "Sequential": "1016.1 GMACs"
+            },
+            "fwd latency": {
+                "Sequential": "10.68 s"
+            }
+        },
+        "depth 2": {
+            "params": {
+                "Bottleneck": "23.5 M"
+            },
+            "MACs": {
+                "Bottleneck": "1016.1 GMACs"
+            },
+            "fwd latency": {
+                "Bottleneck": "9.81 s"
+            }
+        },
+        "depth 3": {
+            "params": {
+                "Conv2d": "20.68 M"
+            },
+            "MACs": {
+                "Conv2d": "924.02 GMACs"
+            },
+            "fwd latency": {
+                "Conv2d": "3.88 s"
+            }
+        }
+    },
+    "Detailed Profile per GPU": {
+        "root": {
+            "extra": {
+                "params": "25.56 M",
+                "percentage of total params": "100.00%",
+                "MACs": "1046.83 GMACs",
+                "percentage of total MACs": "100.00%",
+                "fwd latency": "11.1 s",
+                "percentage of total fwd latency": "100.00%",
+                "fwd FLOPS": "189.31 GFLOPS"
+            },
+            "children": {
+                "conv1": {
+                    "extra": {
+                        "params": "9.41 k",
+                        "percentage of total params": "0.04%",
+                        "MACs": "30.21 GMACs",
+                        "percentage of total MACs": "2.89%",
+                        "fwd latency": "157.46 ms",
+                        "percentage of total fwd latency": "1.42%",
+                        "fwd FLOPS": "383.74 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        3,
+                        224,
+                        224
+                    ],
+                    "output_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "name": "Conv2d"
+                },
+                "bn1": {
+                    "extra": {
+                        "params": "128",
+                        "percentage of total params": "0.00%",
+                        "MACs": "0 MACs",
+                        "percentage of total MACs": "0.00%",
+                        "fwd latency": "46.23 ms",
+                        "percentage of total fwd latency": "0.42%",
+                        "fwd FLOPS": "8.89 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "output_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "name": "BatchNorm2d"
+                },
+                "relu": {
+                    "extra": {
+                        "params": "0",
+                        "percentage of total params": "0.00%",
+                        "MACs": "0 MACs",
+                        "percentage of total MACs": "0.00%",
+                        "fwd latency": "30.39 ms",
+                        "percentage of total fwd latency": "0.27%",
+                        "fwd FLOPS": "6.76 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "output_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "name": "ReLU"
+                },
+                "maxpool": {
+                    "extra": {
+                        "params": "0",
+                        "percentage of total params": "0.00%",
+                        "MACs": "0 MACs",
+                        "percentage of total MACs": "0.00%",
+                        "fwd latency": "77.88 ms",
+                        "percentage of total fwd latency": "0.70%",
+                        "fwd FLOPS": "2.64 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        64,
+                        112,
+                        112
+                    ],
+                    "output_shape": [
+                        256,
+                        64,
+                        56,
+                        56
+                    ],
+                    "name": "MaxPool2d"
+                },
+                "layer1": {
+                    "extra": {
+                        "params": "215.81 k",
+                        "percentage of total params": "0.84%",
+                        "MACs": "170.99 GMACs",
+                        "percentage of total MACs": "16.33%",
+                        "fwd latency": "2.53 s",
+                        "percentage of total fwd latency": "22.83%",
+                        "fwd FLOPS": "136.17 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "75.01 k",
+                                "percentage of total params": "0.29%",
+                                "MACs": "59.19 GMACs",
+                                "percentage of total MACs": "5.65%",
+                                "fwd latency": "953.2 ms",
+                                "percentage of total fwd latency": "8.58%",
+                                "fwd FLOPS": "125.59 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "4.1 k",
+                                        "percentage of total params": "0.02%",
+                                        "MACs": "3.29 GMACs",
+                                        "percentage of total MACs": "0.31%",
+                                        "fwd latency": "54.42 ms",
+                                        "percentage of total fwd latency": "0.49%",
+                                        "fwd FLOPS": "120.85 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.88 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.65 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "36.86 k",
+                                        "percentage of total params": "0.14%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "97.87 ms",
+                                        "percentage of total fwd latency": "0.88%",
+                                        "fwd FLOPS": "604.78 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "12.49 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.23 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "16.38 k",
+                                        "percentage of total params": "0.06%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "156.28 ms",
+                                        "percentage of total fwd latency": "1.41%",
+                                        "fwd FLOPS": "168.33 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "46.27 ms",
+                                        "percentage of total fwd latency": "0.42%",
+                                        "fwd FLOPS": "8.88 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "45.38 ms",
+                                        "percentage of total fwd latency": "0.41%",
+                                        "fwd FLOPS": "6.79 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "ReLU"
+                                },
+                                "downsample": {
+                                    "extra": {
+                                        "params": "16.9 k",
+                                        "percentage of total params": "0.07%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "251.69 ms",
+                                        "percentage of total fwd latency": "2.27%",
+                                        "fwd FLOPS": "106.15 GFLOPS"
+                                    },
+                                    "children": {
+                                        "0": {
+                                            "extra": {
+                                                "params": "16.38 k",
+                                                "percentage of total params": "0.06%",
+                                                "MACs": "13.15 GMACs",
+                                                "percentage of total MACs": "1.26%",
+                                                "fwd latency": "155.82 ms",
+                                                "percentage of total fwd latency": "1.40%",
+                                                "fwd FLOPS": "168.82 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                64,
+                                                56,
+                                                56
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                256,
+                                                56,
+                                                56
+                                            ],
+                                            "name": "Conv2d"
+                                        },
+                                        "1": {
+                                            "extra": {
+                                                "params": "512",
+                                                "percentage of total params": "0.00%",
+                                                "MACs": "0 MACs",
+                                                "percentage of total MACs": "0.00%",
+                                                "fwd latency": "50.09 ms",
+                                                "percentage of total fwd latency": "0.45%",
+                                                "fwd FLOPS": "8.21 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                256,
+                                                56,
+                                                56
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                256,
+                                                56,
+                                                56
+                                            ],
+                                            "name": "BatchNorm2d"
+                                        }
+                                    },
+                                    "name": "BatchNorm2d"
+                                }
+                            },
+                            "name": "Sequential"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "70.4 k",
+                                "percentage of total params": "0.28%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "758.87 ms",
+                                "percentage of total fwd latency": "6.83%",
+                                "fwd FLOPS": "148.55 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "16.38 k",
+                                        "percentage of total params": "0.06%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "144.28 ms",
+                                        "percentage of total fwd latency": "1.30%",
+                                        "fwd FLOPS": "182.33 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.79 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.72 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "36.86 k",
+                                        "percentage of total params": "0.14%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "96.86 ms",
+                                        "percentage of total fwd latency": "0.87%",
+                                        "fwd FLOPS": "611.06 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.85 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.67 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "16.38 k",
+                                        "percentage of total params": "0.06%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "156.04 ms",
+                                        "percentage of total fwd latency": "1.41%",
+                                        "fwd FLOPS": "168.59 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "46.17 ms",
+                                        "percentage of total fwd latency": "0.42%",
+                                        "fwd FLOPS": "8.9 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "45.27 ms",
+                                        "percentage of total fwd latency": "0.41%",
+                                        "fwd FLOPS": "6.81 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "70.4 k",
+                                "percentage of total params": "0.28%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "753.97 ms",
+                                "percentage of total fwd latency": "6.79%",
+                                "fwd FLOPS": "149.51 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "16.38 k",
+                                        "percentage of total params": "0.06%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "131.63 ms",
+                                        "percentage of total fwd latency": "1.19%",
+                                        "fwd FLOPS": "199.85 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "12.67 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.11 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "36.86 k",
+                                        "percentage of total params": "0.14%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "97.5 ms",
+                                        "percentage of total fwd latency": "0.88%",
+                                        "fwd FLOPS": "607.06 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "128",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.83 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.69 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "16.38 k",
+                                        "percentage of total params": "0.06%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "155.73 ms",
+                                        "percentage of total fwd latency": "1.40%",
+                                        "fwd FLOPS": "168.93 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        64,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "46.46 ms",
+                                        "percentage of total fwd latency": "0.42%",
+                                        "fwd FLOPS": "8.85 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "46.15 ms",
+                                        "percentage of total fwd latency": "0.42%",
+                                        "fwd FLOPS": "6.68 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        }
+                    },
+                    "name": "Bottleneck"
+                },
+                "layer2": {
+                    "extra": {
+                        "params": "1.22 M",
+                        "percentage of total params": "4.77%",
+                        "MACs": "263.07 GMACs",
+                        "percentage of total MACs": "25.13%",
+                        "fwd latency": "2.67 s",
+                        "percentage of total fwd latency": "24.05%",
+                        "fwd FLOPS": "197.88 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "379.39 k",
+                                "percentage of total params": "1.48%",
+                                "MACs": "95.36 GMACs",
+                                "percentage of total MACs": "9.11%",
+                                "fwd latency": "971.11 ms",
+                                "percentage of total fwd latency": "8.75%",
+                                "fwd FLOPS": "197.32 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "32.77 k",
+                                        "percentage of total params": "0.13%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "190.11 ms",
+                                        "percentage of total fwd latency": "1.71%",
+                                        "fwd FLOPS": "276.75 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "23.38 ms",
+                                        "percentage of total fwd latency": "0.21%",
+                                        "fwd FLOPS": "8.79 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        56,
+                                        56
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "147.46 k",
+                                        "percentage of total params": "0.58%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "111.85 ms",
+                                        "percentage of total fwd latency": "1.01%",
+                                        "fwd FLOPS": "529.2 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        56,
+                                        56
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.15 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.35 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "88.55 ms",
+                                        "percentage of total fwd latency": "0.80%",
+                                        "fwd FLOPS": "297.07 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "23.37 ms",
+                                        "percentage of total fwd latency": "0.21%",
+                                        "fwd FLOPS": "8.8 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "34.28 ms",
+                                        "percentage of total fwd latency": "0.31%",
+                                        "fwd FLOPS": "6.75 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "ReLU"
+                                },
+                                "downsample": {
+                                    "extra": {
+                                        "params": "132.1 k",
+                                        "percentage of total params": "0.52%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "250.77 ms",
+                                        "percentage of total fwd latency": "2.26%",
+                                        "fwd FLOPS": "210.63 GFLOPS"
+                                    },
+                                    "children": {
+                                        "0": {
+                                            "extra": {
+                                                "params": "131.07 k",
+                                                "percentage of total params": "0.51%",
+                                                "MACs": "26.31 GMACs",
+                                                "percentage of total MACs": "2.51%",
+                                                "fwd latency": "181.47 ms",
+                                                "percentage of total fwd latency": "1.63%",
+                                                "fwd FLOPS": "289.92 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                256,
+                                                56,
+                                                56
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                512,
+                                                28,
+                                                28
+                                            ],
+                                            "name": "Conv2d"
+                                        },
+                                        "1": {
+                                            "extra": {
+                                                "params": "1.02 k",
+                                                "percentage of total params": "0.00%",
+                                                "MACs": "0 MACs",
+                                                "percentage of total MACs": "0.00%",
+                                                "fwd latency": "23.33 ms",
+                                                "percentage of total fwd latency": "0.21%",
+                                                "fwd FLOPS": "8.81 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                512,
+                                                28,
+                                                28
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                512,
+                                                28,
+                                                28
+                                            ],
+                                            "name": "BatchNorm2d"
+                                        }
+                                    },
+                                    "name": "BatchNorm2d"
+                                }
+                            },
+                            "name": "Sequential"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "280.06 k",
+                                "percentage of total params": "1.10%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "531.7 ms",
+                                "percentage of total fwd latency": "4.79%",
+                                "fwd FLOPS": "211.14 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "76.51 ms",
+                                        "percentage of total fwd latency": "0.69%",
+                                        "fwd FLOPS": "343.82 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.59 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "7.79 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "147.46 k",
+                                        "percentage of total params": "0.58%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "77.53 ms",
+                                        "percentage of total fwd latency": "0.70%",
+                                        "fwd FLOPS": "763.48 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.13 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.39 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "88.76 ms",
+                                        "percentage of total fwd latency": "0.80%",
+                                        "fwd FLOPS": "296.38 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "25.68 ms",
+                                        "percentage of total fwd latency": "0.23%",
+                                        "fwd FLOPS": "8.0 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "22.83 ms",
+                                        "percentage of total fwd latency": "0.21%",
+                                        "fwd FLOPS": "6.75 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "280.06 k",
+                                "percentage of total params": "1.10%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "538.6 ms",
+                                "percentage of total fwd latency": "4.85%",
+                                "fwd FLOPS": "208.44 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "87.3 ms",
+                                        "percentage of total fwd latency": "0.79%",
+                                        "fwd FLOPS": "301.34 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.14 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.37 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "147.46 k",
+                                        "percentage of total params": "0.58%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "76.7 ms",
+                                        "percentage of total fwd latency": "0.69%",
+                                        "fwd FLOPS": "771.72 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.19 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.3 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "88.58 ms",
+                                        "percentage of total fwd latency": "0.80%",
+                                        "fwd FLOPS": "296.99 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "23.25 ms",
+                                        "percentage of total fwd latency": "0.21%",
+                                        "fwd FLOPS": "8.84 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "22.67 ms",
+                                        "percentage of total fwd latency": "0.20%",
+                                        "fwd FLOPS": "6.8 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "3": {
+                            "extra": {
+                                "params": "280.06 k",
+                                "percentage of total params": "1.10%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "538.35 ms",
+                                "percentage of total fwd latency": "4.85%",
+                                "fwd FLOPS": "208.54 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "80.19 ms",
+                                        "percentage of total fwd latency": "0.72%",
+                                        "fwd FLOPS": "328.05 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.12 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.39 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "147.46 k",
+                                        "percentage of total params": "0.58%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "78.41 ms",
+                                        "percentage of total fwd latency": "0.71%",
+                                        "fwd FLOPS": "754.85 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "256",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.11 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.41 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "65.54 k",
+                                        "percentage of total params": "0.26%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "94.85 ms",
+                                        "percentage of total fwd latency": "0.85%",
+                                        "fwd FLOPS": "277.35 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        128,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "23.26 ms",
+                                        "percentage of total fwd latency": "0.21%",
+                                        "fwd FLOPS": "8.83 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "22.24 ms",
+                                        "percentage of total fwd latency": "0.20%",
+                                        "fwd FLOPS": "6.93 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        }
+                    },
+                    "name": "Bottleneck"
+                },
+                "layer3": {
+                    "extra": {
+                        "params": "7.1 M",
+                        "percentage of total params": "27.77%",
+                        "MACs": "374.87 GMACs",
+                        "percentage of total MACs": "35.81%",
+                        "fwd latency": "3.79 s",
+                        "percentage of total fwd latency": "34.10%",
+                        "fwd FLOPS": "198.42 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "1.51 M",
+                                "percentage of total params": "5.92%",
+                                "MACs": "95.36 GMACs",
+                                "percentage of total MACs": "9.11%",
+                                "fwd latency": "699.46 ms",
+                                "percentage of total fwd latency": "6.30%",
+                                "fwd FLOPS": "273.32 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "131.07 k",
+                                        "percentage of total params": "0.51%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "112.93 ms",
+                                        "percentage of total fwd latency": "1.02%",
+                                        "fwd FLOPS": "465.9 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.8 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.71 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        28,
+                                        28
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "86.84 ms",
+                                        "percentage of total fwd latency": "0.78%",
+                                        "fwd FLOPS": "681.58 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        28,
+                                        28
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.21 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.99 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "56.43 ms",
+                                        "percentage of total fwd latency": "0.51%",
+                                        "fwd FLOPS": "466.19 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.81 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.7 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "16.98 ms",
+                                        "percentage of total fwd latency": "0.15%",
+                                        "fwd FLOPS": "6.81 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                },
+                                "downsample": {
+                                    "extra": {
+                                        "params": "526.34 k",
+                                        "percentage of total params": "2.06%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "173.56 ms",
+                                        "percentage of total fwd latency": "1.56%",
+                                        "fwd FLOPS": "303.73 GFLOPS"
+                                    },
+                                    "children": {
+                                        "0": {
+                                            "extra": {
+                                                "params": "524.29 k",
+                                                "percentage of total params": "2.05%",
+                                                "MACs": "26.31 GMACs",
+                                                "percentage of total MACs": "2.51%",
+                                                "fwd latency": "115.17 ms",
+                                                "percentage of total fwd latency": "1.04%",
+                                                "fwd FLOPS": "456.82 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                512,
+                                                28,
+                                                28
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                1024,
+                                                14,
+                                                14
+                                            ],
+                                            "name": "Conv2d"
+                                        },
+                                        "1": {
+                                            "extra": {
+                                                "params": "2.05 k",
+                                                "percentage of total params": "0.01%",
+                                                "MACs": "0 MACs",
+                                                "percentage of total MACs": "0.00%",
+                                                "fwd latency": "11.88 ms",
+                                                "percentage of total fwd latency": "0.11%",
+                                                "fwd FLOPS": "8.65 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                1024,
+                                                14,
+                                                14
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                1024,
+                                                14,
+                                                14
+                                            ],
+                                            "name": "BatchNorm2d"
+                                        }
+                                    },
+                                    "name": "BatchNorm2d"
+                                }
+                            },
+                            "name": "Sequential"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "1.12 M",
+                                "percentage of total params": "4.37%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "502.93 ms",
+                                "percentage of total fwd latency": "4.53%",
+                                "fwd FLOPS": "222.76 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "50.27 ms",
+                                        "percentage of total fwd latency": "0.45%",
+                                        "fwd FLOPS": "523.31 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.94 ms",
+                                        "percentage of total fwd latency": "0.04%",
+                                        "fwd FLOPS": "6.51 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "70.51 ms",
+                                        "percentage of total fwd latency": "0.64%",
+                                        "fwd FLOPS": "839.47 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.28 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.84 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "55.7 ms",
+                                        "percentage of total fwd latency": "0.50%",
+                                        "fwd FLOPS": "472.32 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.89 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.64 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "10.97 ms",
+                                        "percentage of total fwd latency": "0.10%",
+                                        "fwd FLOPS": "7.02 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "1.12 M",
+                                "percentage of total params": "4.37%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "479.68 ms",
+                                "percentage of total fwd latency": "4.32%",
+                                "fwd FLOPS": "233.56 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "50.78 ms",
+                                        "percentage of total fwd latency": "0.46%",
+                                        "fwd FLOPS": "518.07 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.43 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.49 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "68.76 ms",
+                                        "percentage of total fwd latency": "0.62%",
+                                        "fwd FLOPS": "860.8 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.32 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.73 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "55.6 ms",
+                                        "percentage of total fwd latency": "0.50%",
+                                        "fwd FLOPS": "473.16 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.91 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.63 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "10.97 ms",
+                                        "percentage of total fwd latency": "0.10%",
+                                        "fwd FLOPS": "7.03 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "3": {
+                            "extra": {
+                                "params": "1.12 M",
+                                "percentage of total params": "4.37%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "480.4 ms",
+                                "percentage of total fwd latency": "4.33%",
+                                "fwd FLOPS": "233.21 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "50.1 ms",
+                                        "percentage of total fwd latency": "0.45%",
+                                        "fwd FLOPS": "525.11 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.31 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.77 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "68.08 ms",
+                                        "percentage of total fwd latency": "0.61%",
+                                        "fwd FLOPS": "869.45 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.35 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.67 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "55.64 ms",
+                                        "percentage of total fwd latency": "0.50%",
+                                        "fwd FLOPS": "472.8 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.89 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.64 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "10.93 ms",
+                                        "percentage of total fwd latency": "0.10%",
+                                        "fwd FLOPS": "7.05 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "4": {
+                            "extra": {
+                                "params": "1.12 M",
+                                "percentage of total params": "4.37%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "487.64 ms",
+                                "percentage of total fwd latency": "4.39%",
+                                "fwd FLOPS": "229.75 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "50.19 ms",
+                                        "percentage of total fwd latency": "0.45%",
+                                        "fwd FLOPS": "524.19 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.28 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.82 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "68.39 ms",
+                                        "percentage of total fwd latency": "0.62%",
+                                        "fwd FLOPS": "865.45 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.28 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.84 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "55.69 ms",
+                                        "percentage of total fwd latency": "0.50%",
+                                        "fwd FLOPS": "472.39 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.83 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.69 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "10.84 ms",
+                                        "percentage of total fwd latency": "0.10%",
+                                        "fwd FLOPS": "7.11 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "5": {
+                            "extra": {
+                                "params": "1.12 M",
+                                "percentage of total params": "4.37%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "485.67 ms",
+                                "percentage of total fwd latency": "4.37%",
+                                "fwd FLOPS": "230.68 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "50.01 ms",
+                                        "percentage of total fwd latency": "0.45%",
+                                        "fwd FLOPS": "526.02 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.31 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.75 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "589.82 k",
+                                        "percentage of total params": "2.31%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "67.69 ms",
+                                        "percentage of total fwd latency": "0.61%",
+                                        "fwd FLOPS": "874.44 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "512",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "3.27 ms",
+                                        "percentage of total fwd latency": "0.03%",
+                                        "fwd FLOPS": "7.85 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "262.14 k",
+                                        "percentage of total params": "1.03%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "55.61 ms",
+                                        "percentage of total fwd latency": "0.50%",
+                                        "fwd FLOPS": "473.07 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        256,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "2.05 k",
+                                        "percentage of total params": "0.01%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "11.83 ms",
+                                        "percentage of total fwd latency": "0.11%",
+                                        "fwd FLOPS": "8.69 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "10.94 ms",
+                                        "percentage of total fwd latency": "0.10%",
+                                        "fwd FLOPS": "7.05 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        }
+                    },
+                    "name": "Bottleneck"
+                },
+                "layer4": {
+                    "extra": {
+                        "params": "14.96 M",
+                        "percentage of total params": "58.55%",
+                        "MACs": "207.17 GMACs",
+                        "percentage of total MACs": "19.79%",
+                        "fwd latency": "1.69 s",
+                        "percentage of total fwd latency": "15.24%",
+                        "fwd FLOPS": "245.19 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "6.04 M",
+                                "percentage of total params": "23.63%",
+                                "MACs": "95.36 GMACs",
+                                "percentage of total MACs": "9.11%",
+                                "fwd latency": "640.32 ms",
+                                "percentage of total fwd latency": "5.77%",
+                                "fwd FLOPS": "298.21 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                1024,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                2048,
+                                7,
+                                7
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "524.29 k",
+                                        "percentage of total params": "2.05%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "85.92 ms",
+                                        "percentage of total fwd latency": "0.77%",
+                                        "fwd FLOPS": "612.38 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        1024,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.15 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.36 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        14,
+                                        14
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "2.36 M",
+                                        "percentage of total params": "9.23%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "86.45 ms",
+                                        "percentage of total fwd latency": "0.78%",
+                                        "fwd FLOPS": "684.68 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        14,
+                                        14
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "2.02 ms",
+                                        "percentage of total fwd latency": "0.02%",
+                                        "fwd FLOPS": "6.35 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "1.05 M",
+                                        "percentage of total params": "4.10%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "40.42 ms",
+                                        "percentage of total fwd latency": "0.36%",
+                                        "fwd FLOPS": "650.76 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "4.1 k",
+                                        "percentage of total params": "0.02%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.22 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "8.26 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "7.86 ms",
+                                        "percentage of total fwd latency": "0.07%",
+                                        "fwd FLOPS": "7.35 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "ReLU"
+                                },
+                                "downsample": {
+                                    "extra": {
+                                        "params": "2.1 M",
+                                        "percentage of total params": "8.22%",
+                                        "MACs": "26.31 GMACs",
+                                        "percentage of total MACs": "2.51%",
+                                        "fwd latency": "179.45 ms",
+                                        "percentage of total fwd latency": "1.62%",
+                                        "fwd FLOPS": "293.48 GFLOPS"
+                                    },
+                                    "children": {
+                                        "0": {
+                                            "extra": {
+                                                "params": "2.1 M",
+                                                "percentage of total params": "8.21%",
+                                                "MACs": "26.31 GMACs",
+                                                "percentage of total MACs": "2.51%",
+                                                "fwd latency": "83.91 ms",
+                                                "percentage of total fwd latency": "0.76%",
+                                                "fwd FLOPS": "627.04 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                1024,
+                                                14,
+                                                14
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                2048,
+                                                7,
+                                                7
+                                            ],
+                                            "name": "Conv2d"
+                                        },
+                                        "1": {
+                                            "extra": {
+                                                "params": "4.1 k",
+                                                "percentage of total params": "0.02%",
+                                                "MACs": "0 MACs",
+                                                "percentage of total MACs": "0.00%",
+                                                "fwd latency": "6.29 ms",
+                                                "percentage of total fwd latency": "0.06%",
+                                                "fwd FLOPS": "8.17 GFLOPS"
+                                            },
+                                            "input_shape": [
+                                                256,
+                                                2048,
+                                                7,
+                                                7
+                                            ],
+                                            "output_shape": [
+                                                256,
+                                                2048,
+                                                7,
+                                                7
+                                            ],
+                                            "name": "BatchNorm2d"
+                                        }
+                                    },
+                                    "name": "BatchNorm2d"
+                                }
+                            },
+                            "name": "Sequential"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "4.46 M",
+                                "percentage of total params": "17.46%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "489.29 ms",
+                                "percentage of total fwd latency": "4.41%",
+                                "fwd FLOPS": "228.74 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                2048,
+                                7,
+                                7
+                            ],
+                            "output_shape": [
+                                256,
+                                2048,
+                                7,
+                                7
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "1.05 M",
+                                        "percentage of total params": "4.10%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "37.45 ms",
+                                        "percentage of total fwd latency": "0.34%",
+                                        "fwd FLOPS": "702.42 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "1.28 ms",
+                                        "percentage of total fwd latency": "0.01%",
+                                        "fwd FLOPS": "10.05 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "2.36 M",
+                                        "percentage of total params": "9.23%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "69.72 ms",
+                                        "percentage of total fwd latency": "0.63%",
+                                        "fwd FLOPS": "848.91 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "1.73 ms",
+                                        "percentage of total fwd latency": "0.02%",
+                                        "fwd FLOPS": "7.41 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "1.05 M",
+                                        "percentage of total params": "4.10%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "40.27 ms",
+                                        "percentage of total fwd latency": "0.36%",
+                                        "fwd FLOPS": "653.2 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "4.1 k",
+                                        "percentage of total params": "0.02%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.67 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "7.71 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "4.77 ms",
+                                        "percentage of total fwd latency": "0.04%",
+                                        "fwd FLOPS": "8.08 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "4.46 M",
+                                "percentage of total params": "17.46%",
+                                "MACs": "55.9 GMACs",
+                                "percentage of total MACs": "5.34%",
+                                "fwd latency": "494.11 ms",
+                                "percentage of total fwd latency": "4.45%",
+                                "fwd FLOPS": "226.51 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                2048,
+                                7,
+                                7
+                            ],
+                            "output_shape": [
+                                256,
+                                2048,
+                                7,
+                                7
+                            ],
+                            "children": {
+                                "conv1": {
+                                    "extra": {
+                                        "params": "1.05 M",
+                                        "percentage of total params": "4.10%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "47.34 ms",
+                                        "percentage of total fwd latency": "0.43%",
+                                        "fwd FLOPS": "555.66 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn1": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "1.24 ms",
+                                        "percentage of total fwd latency": "0.01%",
+                                        "fwd FLOPS": "10.37 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv2": {
+                                    "extra": {
+                                        "params": "2.36 M",
+                                        "percentage of total params": "9.23%",
+                                        "MACs": "29.6 GMACs",
+                                        "percentage of total MACs": "2.83%",
+                                        "fwd latency": "70.28 ms",
+                                        "percentage of total fwd latency": "0.63%",
+                                        "fwd FLOPS": "842.24 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn2": {
+                                    "extra": {
+                                        "params": "1.02 k",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "1.71 ms",
+                                        "percentage of total fwd latency": "0.02%",
+                                        "fwd FLOPS": "7.51 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "conv3": {
+                                    "extra": {
+                                        "params": "1.05 M",
+                                        "percentage of total params": "4.10%",
+                                        "MACs": "13.15 GMACs",
+                                        "percentage of total MACs": "1.26%",
+                                        "fwd latency": "40.42 ms",
+                                        "percentage of total fwd latency": "0.36%",
+                                        "fwd FLOPS": "650.82 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        512,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "Conv2d"
+                                },
+                                "bn3": {
+                                    "extra": {
+                                        "params": "4.1 k",
+                                        "percentage of total params": "0.02%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "6.51 ms",
+                                        "percentage of total fwd latency": "0.06%",
+                                        "fwd FLOPS": "7.9 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "BatchNorm2d"
+                                },
+                                "relu": {
+                                    "extra": {
+                                        "params": "0",
+                                        "percentage of total params": "0.00%",
+                                        "MACs": "0 MACs",
+                                        "percentage of total MACs": "0.00%",
+                                        "fwd latency": "4.75 ms",
+                                        "percentage of total fwd latency": "0.04%",
+                                        "fwd FLOPS": "8.11 GFLOPS"
+                                    },
+                                    "input_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "output_shape": [
+                                        256,
+                                        2048,
+                                        7,
+                                        7
+                                    ],
+                                    "name": "ReLU"
+                                }
+                            },
+                            "name": "ReLU"
+                        }
+                    },
+                    "name": "Bottleneck"
+                },
+                "avgpool": {
+                    "extra": {
+                        "params": "0",
+                        "percentage of total params": "0.00%",
+                        "MACs": "0 MACs",
+                        "percentage of total MACs": "0.00%",
+                        "fwd latency": "2.95 ms",
+                        "percentage of total fwd latency": "0.03%",
+                        "fwd FLOPS": "8.71 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        2048,
+                        7,
+                        7
+                    ],
+                    "output_shape": [
+                        256,
+                        2048,
+                        1,
+                        1
+                    ],
+                    "name": "AdaptiveAvgPool2d"
+                },
+                "fc": {
+                    "extra": {
+                        "params": "2.05 M",
+                        "percentage of total params": "8.02%",
+                        "MACs": "524.29 MMACs",
+                        "percentage of total MACs": "0.05%",
+                        "fwd latency": "1.53 ms",
+                        "percentage of total fwd latency": "0.01%",
+                        "fwd FLOPS": "684.84 GFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        2048
+                    ],
+                    "output_shape": [
+                        256,
+                        1000
+                    ],
+                    "name": "Linear"
+                }
+            },
+            "name": "Linear"
+        }
+    }
+}

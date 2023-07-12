@@ -1,0 +1,987 @@
+{
+    "Profile Summary": {
+        "params per gpu": "138357544",
+        "params of model": "0       ",
+        "fwd MACs per GPU": "3960.39 GMACs",
+        "fwd flops per GPU": "7929.29 G",
+        "fwd flops of model": "7929.29 G",
+        "fwd latency": "11.82 s ",
+        "fwd FLOPS per GPU": "670.87 GFLOPS"
+    },
+    "Aggregated Profile per GPU": {
+        "depth 0": {
+            "params": {
+                "VGG": "138.36 M"
+            },
+            "MACs": {
+                "VGG": "3960.39 GMACs"
+            },
+            "fwd latency": {
+                "VGG": "11.82 s"
+            }
+        },
+        "depth 1": {
+            "params": {
+                "Sequential": "138.36 M"
+            },
+            "MACs": {
+                "Sequential": "3960.39 GMACs"
+            },
+            "fwd latency": {
+                "Sequential": "11.77 s"
+            }
+        }
+    },
+    "Detailed Profile per GPU": {
+        "root": {
+            "extra": {
+                "params": "138.36 M",
+                "percentage of total params": "100.00%",
+                "MACs": "3960.39 GMACs",
+                "percentage of total MACs": "100.00%",
+                "fwd latency": "11.82 s",
+                "percentage of total fwd latency": "100.00%",
+                "fwd FLOPS": "670.87 GFLOPS"
+            },
+            "children": {
+                "features": {
+                    "extra": {
+                        "params": "14.71 M",
+                        "percentage of total params": "10.64%",
+                        "MACs": "3928.74 GMACs",
+                        "percentage of total MACs": "99.20%",
+                        "fwd latency": "11.68 s",
+                        "percentage of total fwd latency": "98.84%",
+                        "fwd FLOPS": "673.33 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "1.79 k",
+                                "percentage of total params": "0.00%",
+                                "MACs": "22.2 GMACs",
+                                "percentage of total MACs": "0.56%",
+                                "fwd latency": "669.26 ms",
+                                "percentage of total fwd latency": "5.66%",
+                                "fwd FLOPS": "67.56 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                3,
+                                224,
+                                224
+                            ],
+                            "output_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "120.85 ms",
+                                "percentage of total fwd latency": "1.02%",
+                                "fwd FLOPS": "6.8 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "output_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "36.93 k",
+                                "percentage of total params": "0.03%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "1.7 s",
+                                "percentage of total fwd latency": "14.41%",
+                                "fwd FLOPS": "556.71 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "output_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "3": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "120.73 ms",
+                                "percentage of total fwd latency": "1.02%",
+                                "fwd FLOPS": "6.81 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "output_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "name": "ReLU"
+                        },
+                        "4": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "243.51 ms",
+                                "percentage of total fwd latency": "2.06%",
+                                "fwd FLOPS": "3.38 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                224,
+                                224
+                            ],
+                            "output_shape": [
+                                256,
+                                64,
+                                112,
+                                112
+                            ],
+                            "name": "MaxPool2d"
+                        },
+                        "5": {
+                            "extra": {
+                                "params": "73.86 k",
+                                "percentage of total params": "0.05%",
+                                "MACs": "236.76 GMACs",
+                                "percentage of total MACs": "5.98%",
+                                "fwd latency": "702.2 ms",
+                                "percentage of total fwd latency": "5.94%",
+                                "fwd FLOPS": "674.93 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                64,
+                                112,
+                                112
+                            ],
+                            "output_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "6": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "61.9 ms",
+                                "percentage of total fwd latency": "0.52%",
+                                "fwd FLOPS": "6.64 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "output_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "name": "ReLU"
+                        },
+                        "7": {
+                            "extra": {
+                                "params": "147.58 k",
+                                "percentage of total params": "0.11%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "1.18 s",
+                                "percentage of total fwd latency": "10.00%",
+                                "fwd FLOPS": "801.84 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "output_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "8": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "61.14 ms",
+                                "percentage of total fwd latency": "0.52%",
+                                "fwd FLOPS": "6.72 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "output_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "name": "ReLU"
+                        },
+                        "9": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "127.91 ms",
+                                "percentage of total fwd latency": "1.08%",
+                                "fwd FLOPS": "3.21 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                128,
+                                112,
+                                112
+                            ],
+                            "output_shape": [
+                                256,
+                                128,
+                                56,
+                                56
+                            ],
+                            "name": "MaxPool2d"
+                        },
+                        "10": {
+                            "extra": {
+                                "params": "295.17 k",
+                                "percentage of total params": "0.21%",
+                                "MACs": "236.76 GMACs",
+                                "percentage of total MACs": "5.98%",
+                                "fwd latency": "556.23 ms",
+                                "percentage of total fwd latency": "4.71%",
+                                "fwd FLOPS": "851.68 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                128,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "11": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "31.04 ms",
+                                "percentage of total fwd latency": "0.26%",
+                                "fwd FLOPS": "6.62 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "ReLU"
+                        },
+                        "12": {
+                            "extra": {
+                                "params": "590.08 k",
+                                "percentage of total params": "0.43%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "986.84 ms",
+                                "percentage of total fwd latency": "8.35%",
+                                "fwd FLOPS": "959.88 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "13": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "33.14 ms",
+                                "percentage of total fwd latency": "0.28%",
+                                "fwd FLOPS": "6.2 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "ReLU"
+                        },
+                        "14": {
+                            "extra": {
+                                "params": "590.08 k",
+                                "percentage of total params": "0.43%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "1.04 s",
+                                "percentage of total fwd latency": "8.79%",
+                                "fwd FLOPS": "911.98 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "15": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "30.77 ms",
+                                "percentage of total fwd latency": "0.26%",
+                                "fwd FLOPS": "6.68 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "name": "ReLU"
+                        },
+                        "16": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "59.91 ms",
+                                "percentage of total fwd latency": "0.51%",
+                                "fwd FLOPS": "3.43 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                56,
+                                56
+                            ],
+                            "output_shape": [
+                                256,
+                                256,
+                                28,
+                                28
+                            ],
+                            "name": "MaxPool2d"
+                        },
+                        "17": {
+                            "extra": {
+                                "params": "1.18 M",
+                                "percentage of total params": "0.85%",
+                                "MACs": "236.76 GMACs",
+                                "percentage of total MACs": "5.98%",
+                                "fwd latency": "491.34 ms",
+                                "percentage of total fwd latency": "4.16%",
+                                "fwd FLOPS": "963.94 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                256,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "18": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "15.63 ms",
+                                "percentage of total fwd latency": "0.13%",
+                                "fwd FLOPS": "6.57 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "ReLU"
+                        },
+                        "19": {
+                            "extra": {
+                                "params": "2.36 M",
+                                "percentage of total params": "1.71%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "921.29 ms",
+                                "percentage of total fwd latency": "7.79%",
+                                "fwd FLOPS": "1.03 TFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "20": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "15.49 ms",
+                                "percentage of total fwd latency": "0.13%",
+                                "fwd FLOPS": "6.63 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "ReLU"
+                        },
+                        "21": {
+                            "extra": {
+                                "params": "2.36 M",
+                                "percentage of total params": "1.71%",
+                                "MACs": "473.52 GMACs",
+                                "percentage of total MACs": "11.96%",
+                                "fwd latency": "923.63 ms",
+                                "percentage of total fwd latency": "7.81%",
+                                "fwd FLOPS": "1.03 TFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "22": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "15.39 ms",
+                                "percentage of total fwd latency": "0.13%",
+                                "fwd FLOPS": "6.68 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "name": "ReLU"
+                        },
+                        "23": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "31.15 ms",
+                                "percentage of total fwd latency": "0.26%",
+                                "fwd FLOPS": "3.3 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                28,
+                                28
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "MaxPool2d"
+                        },
+                        "24": {
+                            "extra": {
+                                "params": "2.36 M",
+                                "percentage of total params": "1.71%",
+                                "MACs": "118.38 GMACs",
+                                "percentage of total MACs": "2.99%",
+                                "fwd latency": "241.35 ms",
+                                "percentage of total fwd latency": "2.04%",
+                                "fwd FLOPS": "981.08 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "25": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "3.74 ms",
+                                "percentage of total fwd latency": "0.03%",
+                                "fwd FLOPS": "6.88 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "ReLU"
+                        },
+                        "26": {
+                            "extra": {
+                                "params": "2.36 M",
+                                "percentage of total params": "1.71%",
+                                "MACs": "118.38 GMACs",
+                                "percentage of total MACs": "2.99%",
+                                "fwd latency": "241.67 ms",
+                                "percentage of total fwd latency": "2.04%",
+                                "fwd FLOPS": "979.8 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "27": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "3.68 ms",
+                                "percentage of total fwd latency": "0.03%",
+                                "fwd FLOPS": "6.98 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "ReLU"
+                        },
+                        "28": {
+                            "extra": {
+                                "params": "2.36 M",
+                                "percentage of total params": "1.71%",
+                                "MACs": "118.38 GMACs",
+                                "percentage of total MACs": "2.99%",
+                                "fwd latency": "248.97 ms",
+                                "percentage of total fwd latency": "2.11%",
+                                "fwd FLOPS": "951.06 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "Conv2d"
+                        },
+                        "29": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "3.66 ms",
+                                "percentage of total fwd latency": "0.03%",
+                                "fwd FLOPS": "7.01 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "name": "ReLU"
+                        },
+                        "30": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "7.86 ms",
+                                "percentage of total fwd latency": "0.07%",
+                                "fwd FLOPS": "3.27 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                512,
+                                14,
+                                14
+                            ],
+                            "output_shape": [
+                                256,
+                                512,
+                                7,
+                                7
+                            ],
+                            "name": "MaxPool2d"
+                        }
+                    },
+                    "name": "MaxPool2d"
+                },
+                "avgpool": {
+                    "extra": {
+                        "params": "0",
+                        "percentage of total params": "0.00%",
+                        "MACs": "0 MACs",
+                        "percentage of total MACs": "0.00%",
+                        "fwd latency": "27.46 ms",
+                        "percentage of total fwd latency": "0.23%",
+                        "fwd FLOPS": "233.91 MFLOPS"
+                    },
+                    "input_shape": [
+                        256,
+                        512,
+                        7,
+                        7
+                    ],
+                    "output_shape": [
+                        256,
+                        512,
+                        7,
+                        7
+                    ],
+                    "name": "AdaptiveAvgPool2d"
+                },
+                "classifier": {
+                    "extra": {
+                        "params": "123.64 M",
+                        "percentage of total params": "89.36%",
+                        "MACs": "31.65 GMACs",
+                        "percentage of total MACs": "0.80%",
+                        "fwd latency": "83.76 ms",
+                        "percentage of total fwd latency": "0.71%",
+                        "fwd FLOPS": "755.76 GFLOPS"
+                    },
+                    "children": {
+                        "0": {
+                            "extra": {
+                                "params": "102.76 M",
+                                "percentage of total params": "74.27%",
+                                "MACs": "26.31 GMACs",
+                                "percentage of total MACs": "0.66%",
+                                "fwd latency": "59.04 ms",
+                                "percentage of total fwd latency": "0.50%",
+                                "fwd FLOPS": "891.14 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                25088
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "Linear"
+                        },
+                        "1": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "273.7 us",
+                                "percentage of total fwd latency": "0.00%",
+                                "fwd FLOPS": "3.83 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "ReLU"
+                        },
+                        "2": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "76.29 us",
+                                "percentage of total fwd latency": "0.00%",
+                                "fwd FLOPS": "0.0 FLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "Dropout"
+                        },
+                        "3": {
+                            "extra": {
+                                "params": "16.78 M",
+                                "percentage of total params": "12.13%",
+                                "MACs": "4.29 GMACs",
+                                "percentage of total MACs": "0.11%",
+                                "fwd latency": "11.0 ms",
+                                "percentage of total fwd latency": "0.09%",
+                                "fwd FLOPS": "780.59 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "Linear"
+                        },
+                        "4": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "275.85 us",
+                                "percentage of total fwd latency": "0.00%",
+                                "fwd FLOPS": "3.8 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "ReLU"
+                        },
+                        "5": {
+                            "extra": {
+                                "params": "0",
+                                "percentage of total params": "0.00%",
+                                "MACs": "0 MACs",
+                                "percentage of total MACs": "0.00%",
+                                "fwd latency": "72.24 us",
+                                "percentage of total fwd latency": "0.00%",
+                                "fwd FLOPS": "0.0 FLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                4096
+                            ],
+                            "name": "Dropout"
+                        },
+                        "6": {
+                            "extra": {
+                                "params": "4.1 M",
+                                "percentage of total params": "2.96%",
+                                "MACs": "1.05 GMACs",
+                                "percentage of total MACs": "0.03%",
+                                "fwd latency": "2.77 ms",
+                                "percentage of total fwd latency": "0.02%",
+                                "fwd FLOPS": "758.09 GFLOPS"
+                            },
+                            "input_shape": [
+                                256,
+                                4096
+                            ],
+                            "output_shape": [
+                                256,
+                                1000
+                            ],
+                            "name": "Linear"
+                        }
+                    },
+                    "name": "Linear"
+                }
+            },
+            "name": "Sequential"
+        }
+    }
+}
