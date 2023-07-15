@@ -323,9 +323,13 @@ def get_model_inference_profile(model,
             print("output", output)
             if len(input) > 0:
                 module.__input_shape__ = list(input[0].size())
-            if hasattr(output, '__iter__') or hasattr(output, '__getitem__'):
+            if isinstance(output, (list, tuple)):
                 module.__output_shape__ = [
                     [-1] + list(o.size())[1:] for o in output
+                ]
+            elif isinstance(output, dict):
+                module.__output_shape__ = [
+                    [-1] + list(v.size())[1:] if hasattr(v, "size") else list() for k, v in output.items()
                 ]
             else:
                 module.__output_shape__ = list(output.size())
