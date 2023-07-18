@@ -1,6 +1,7 @@
 import os
 import threading
 import time
+import sys
 from functools import wraps
 
 import torch
@@ -286,10 +287,10 @@ image_w = 128
 image_h = 128
 
 
-def run_master(split_size, num_workers):
+def run_master(split_size, num_workers, shards):
 
     # model = DistResNet50(split_size, ["worker{}".format(i + 1) for i in range(num_workers)], args=(), pre_trained=True)
-    model = RRDistResNet50(split_size, ["worker{}".format(i + 1) for i in range(num_workers)], ["cuda:{}".format(i) for i in range(4)], args=(), shards=[1, 2, 2], pre_trained=True)
+    model = RRDistResNet50(split_size, ["worker{}".format(i + 1) for i in range(num_workers)], ["cuda:{}".format(i) for i in range(4)], args=(), shards=shards)
 
     one_hot_indices = torch.LongTensor(batch_size) \
                            .random_(0, num_classes) \
@@ -307,7 +308,7 @@ def run_master(split_size, num_workers):
         outputs = model(inputs)
 
 
-def run_worker(rank, world_size, num_split):
+def run_worker(rank, world_size, num_split, shards):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -321,7 +322,7 @@ def run_worker(rank, world_size, num_split):
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(num_split, num_workers=world_size - 1)
+        run_master(num_split, num_workers=world_size - 1, shards=shards)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -336,9 +337,17 @@ def run_worker(rank, world_size, num_split):
 
 
 if __name__=="__main__":
-    world_size = 4
-    for num_split in [1, 2, 4, 8]:
-        tik = time.time()
-        mp.spawn(run_worker, args=(world_size, num_split), nprocs=world_size, join=True)
-        tok = time.time()
-        print(f"number of splits = {num_split}, execution time = {tok - tik}")
+    file = open("./resnet50_even.log", "w")
+    original_stdout = sys.stdout
+    sys.stdout = file
+    combo = [[1, 2], [1, 1, 2, 2], [1, 1, 2], [1, 2, 2]]
+    for shards in combo:
+        world_size = len(shards) + 1
+        print("Placement:", shards)
+        for num_split in [1, 2, 4, 8]:
+            tik = time.time()
+            mp.spawn(run_worker, args=(world_size, num_split, shards), nprocs=world_size, join=True)
+            tok = time.time()
+            print(f"number of splits = {num_split}, execution time = {tok - tik} s")
+
+    sys.stdout = original_stdout
