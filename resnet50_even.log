@@ -1,0 +1,20 @@
+Placement: [1, 2]
+size of micro-batches = 1, execution time = 118.19870233535767 s, throughput = 101.52395722546228 samples/sec
+size of micro-batches = 2, execution time = 61.93537974357605 s, throughput = 193.75032573760302 samples/sec
+size of micro-batches = 4, execution time = 36.75461935997009 s, throughput = 326.4895735274393 samples/sec
+size of micro-batches = 8, execution time = 25.017178058624268 s, throughput = 479.6704077446175 samples/sec
+Placement: [1, 1, 2, 2]
+size of micro-batches = 1, execution time = 69.40745115280151 s, throughput = 172.89210020955568 samples/sec
+size of micro-batches = 2, execution time = 40.22949409484863 s, throughput = 298.28861311821953 samples/sec
+size of micro-batches = 4, execution time = 26.9430091381073 s, throughput = 445.3845499769214 samples/sec
+size of micro-batches = 8, execution time = 21.103822708129883 s, throughput = 568.6173621699925 samples/sec
+Placement: [1, 1, 2]
+size of micro-batches = 1, execution time = 117.36295175552368 s, throughput = 102.24691711057974 samples/sec
+size of micro-batches = 2, execution time = 61.42121243476868 s, throughput = 195.37224232986918 samples/sec
+size of micro-batches = 4, execution time = 37.40035319328308 s, throughput = 320.852584947116 samples/sec
+size of micro-batches = 8, execution time = 25.367107152938843 s, throughput = 473.05354637609 samples/sec
+Placement: [1, 2, 2]
+size of micro-batches = 1, execution time = 97.01187133789062 s, throughput = 123.69620165561196 samples/sec
+size of micro-batches = 2, execution time = 53.89855885505676 s, throughput = 222.6404611720738 samples/sec
+size of micro-batches = 4, execution time = 32.47342896461487 s, throughput = 369.53288835238095 samples/sec
+size of micro-batches = 8, execution time = 23.05975651741028 s, throughput = 520.3871077710606 samples/sec
