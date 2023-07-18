@@ -85,15 +85,14 @@ class ResNetShard1(ResNetBase):
 
         self.device = device
         if "pre_trained" in kwargs and kwargs["pre_trained"]:
-            self.seq = nn.Sequential(kwargs["conv1"], kwargs['bn1'], kwargs["relu"], kwargs["maxpool"], kwargs["seq0"], kwargs["seq1"]).to(self.device)
+            self.seq = nn.Sequential(kwargs["conv1"], kwargs['bn1'], kwargs["relu"], kwargs["maxpool"], kwargs["seq0"]).to(self.device)
         else:
             self.seq = nn.Sequential(
                 nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False),
                 self._norm_layer(self.inplanes),
                 nn.ReLU(inplace=True),
                 nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
-                self._make_layer(64, 3),
-                self._make_layer(128, 4, stride=2)
+                self._make_layer(64, 3)
             ).to(self.device)
 
         for m in self.modules():
@@ -106,7 +105,7 @@ class ResNetShard1(ResNetBase):
     def forward(self, x_rref):
         x = x_rref.to_here().to(self.device)
         with self._lock:
-            out =  self.seq(x)
+            out = self.seq(x)
         return out.cpu()
 
 
@@ -116,14 +115,15 @@ class ResNetShard2(ResNetBase):
     """
     def __init__(self, device, *args, **kwargs):
         super(ResNetShard2, self).__init__(
-            Bottleneck, 512, num_classes=num_classes, *args, **kwargs)
+            Bottleneck, 256, num_classes=num_classes, *args, **kwargs)
 
         self.device = device
         if "pre_trained" in kwargs and kwargs["pre_trained"]:
-            self.seq = nn.Sequential(kwargs["seq2"], kwargs["seq3"], kwargs["avgpool"]).to(self.device)
+            self.seq = nn.Sequential(kwargs["seq1"], kwargs["seq2"], kwargs["seq3"], kwargs["avgpool"]).to(self.device)
             self.fc = kwargs["fc"].to(self.device)
         else:
             self.seq = nn.Sequential(
+                self._make_layer(128, 4, stride=2),
                 self._make_layer(256, 6, stride=2),
                 self._make_layer(512, 3, stride=2),
                 nn.AdaptiveAvgPool2d((1, 1)),
@@ -137,61 +137,6 @@ class ResNetShard2(ResNetBase):
         return out.cpu()
 
 
-class DistResNet50(nn.Module):
-    """
-    Assemble two ResNet parts as an nn.Module and define pipelining logic
-    """
-    def __init__(self, split_size, workers, *args, **kwargs):
-        super(DistResNet50, self).__init__()
-
-        self.split_size = split_size
-
-        if "pre_trained" in kwargs and kwargs["pre_trained"] == True:
-            resnet50 = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_resnet50', pretrained=True)
-            kwargs['conv1'] = resnet50._modules['conv1']
-            kwargs['bn1'] = resnet50._modules['bn1']
-            kwargs['relu'] = resnet50._modules['relu']
-            kwargs['maxpool'] = resnet50._modules['maxpool']
-            kwargs['avgpool'] = resnet50._modules['avgpool']
-            kwargs['fc'] = resnet50._modules['fc']
-            for i in range(4):
-                kwargs['seq{}'.format(i)] = resnet50._modules['layers']._modules[str(i)]
-
-        # Put the first part of the ResNet50 on workers[0]
-        self.p1_rref = rpc.remote(
-            workers[0],
-            ResNetShard1,
-            args = ("cuda:0",) + args,
-            kwargs = kwargs
-        )
-
-        # Put the second part of the ResNet50 on workers[1]
-        self.p2_rref = rpc.remote(
-            workers[1],
-            ResNetShard2,
-            args = ("cuda:1",) + args,
-            kwargs = kwargs
-        )
-
-    def forward(self, xs):
-        # Split the input batch xs into micro-batches, and collect async RPC
-        # futures into a list
-        out_futures = []
-        for x in iter(xs.split(self.split_size, dim=0)):
-            x_rref = RRef(x)
-            y_rref = self.p1_rref.remote().forward(x_rref)
-            z_fut = self.p2_rref.rpc_async().forward(y_rref)
-            out_futures.append(z_fut)
-
-        # collect and cat all output tensors into one tensor.
-        return torch.cat(torch.futures.wait_all(out_futures))
-
-    def parameter_rrefs(self):
-        remote_params = []
-        remote_params.extend(self.p1_rref.remote().parameter_rrefs().to_here())
-        remote_params.extend(self.p2_rref.remote().parameter_rrefs().to_here())
-        return remote_params
-    
 class RRDistResNet50(nn.Module):
     """
     Assemble two ResNet parts as an nn.Module and define pipelining logic
@@ -288,14 +233,13 @@ image_h = 128
 
 def run_master(split_size, num_workers, shards):
 
-    # model = DistResNet50(split_size, ["worker{}".format(i + 1) for i in range(num_workers)], args=(), pre_trained=True)
     model = RRDistResNet50(split_size, ["worker{}".format(i + 1) for i in range(num_workers)], ["cuda:{}".format(i) for i in range(4)], args=(), shards=shards)
 
     one_hot_indices = torch.LongTensor(batch_size) \
                            .random_(0, num_classes) \
                            .view(batch_size, 1)
 
-    # generating inputs
+    # generating random inputs
     inputs = torch.randn(batch_size, 3, image_w, image_h)
     labels = torch.zeros(batch_size, num_classes) \
                     .scatter_(1, one_hot_indices, 1)
@@ -333,7 +277,7 @@ def run_worker(rank, world_size, num_split, shards):
 
 
 if __name__=="__main__":
-    file = open("./resnet50_even.log", "w")
+    file = open("./resnet50_mild_uneven.log", "w")
     original_stdout = sys.stdout
     sys.stdout = file
     combo = [[1, 2], [1, 1, 2, 2], [1, 1, 2], [1, 2, 2]]
