@@ -11,7 +11,7 @@ class CNNShardBase(nn.Module):
         super(CNNShardBase, self).__init__()
 
         self.lock = threading.Lock()
-        self.layers = [m.to(device) for m in layers]
+        self.layers = [m.to(device) if isinstance(m, nn.Module) else m for m in layers]
         self.device = device
     
     def forward(self, x_rref):

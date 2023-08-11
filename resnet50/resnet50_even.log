@@ -1,20 +1,20 @@
 Placement: [1, 2]
-size of micro-batches = 1, end-to-end execution time = 113.60419487953186 s
-size of micro-batches = 2, end-to-end execution time = 60.917972803115845 s
-size of micro-batches = 4, end-to-end execution time = 36.37890434265137 s
-size of micro-batches = 8, end-to-end execution time = 24.833817958831787 s
+size of micro-batches = 1, end-to-end execution time = 136.5057830810547 s
+size of micro-batches = 2, end-to-end execution time = 71.32074308395386 s
+size of micro-batches = 4, end-to-end execution time = 42.229968786239624 s
+size of micro-batches = 8, end-to-end execution time = 27.750805139541626 s
 Placement: [1, 1, 2, 2]
-size of micro-batches = 1, end-to-end execution time = 67.7615978717804 s
-size of micro-batches = 2, end-to-end execution time = 40.002039194107056 s
-size of micro-batches = 4, end-to-end execution time = 26.644702196121216 s
-size of micro-batches = 8, end-to-end execution time = 20.694892644882202 s
+size of micro-batches = 1, end-to-end execution time = 80.8132677078247 s
+size of micro-batches = 2, end-to-end execution time = 45.68305039405823 s
+size of micro-batches = 4, end-to-end execution time = 29.72357416152954 s
+size of micro-batches = 8, end-to-end execution time = 22.819170236587524 s
 Placement: [1, 1, 2]
-size of micro-batches = 1, end-to-end execution time = 115.3243317604065 s
-size of micro-batches = 2, end-to-end execution time = 61.94710969924927 s
-size of micro-batches = 4, end-to-end execution time = 36.56097340583801 s
-size of micro-batches = 8, end-to-end execution time = 24.76120924949646 s
+size of micro-batches = 1, end-to-end execution time = 139.5841019153595 s
+size of micro-batches = 2, end-to-end execution time = 72.89291739463806 s
+size of micro-batches = 4, end-to-end execution time = 42.01358723640442 s
+size of micro-batches = 8, end-to-end execution time = 29.373295545578003 s
 Placement: [1, 2, 2]
-size of micro-batches = 1, end-to-end execution time = 94.83917331695557 s
-size of micro-batches = 2, end-to-end execution time = 51.94817137718201 s
-size of micro-batches = 4, end-to-end execution time = 31.90476632118225 s
-size of micro-batches = 8, end-to-end execution time = 22.755438804626465 s
+size of micro-batches = 1, end-to-end execution time = 79.15112781524658 s
+size of micro-batches = 2, end-to-end execution time = 44.66638469696045 s
+size of micro-batches = 4, end-to-end execution time = 29.064724683761597 s
+size of micro-batches = 8, end-to-end execution time = 22.556896686553955 s

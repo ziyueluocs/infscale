@@ -28,6 +28,8 @@ batch_size = 120
 image_w = 128
 image_h = 128
 
+def flat_func(x):
+    return torch.flatten(x, 1)
 
 def run_master(split_size, num_workers, partitions, shards, pre_trained = False):
 
@@ -39,8 +41,10 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
         net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
     else:
         net = resnet50()
+    net.eval()
 
     workers = ["worker{}".format(i + 1) for i in range(num_workers)]
+
     layers = [
         net.conv1,
         net.bn1,
@@ -51,12 +55,12 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
         *net.layer3,
         *net.layer4,
         net.avgpool,
-        lambda x: torch.flatten(x, 1),
+        flat_func,
         net.fc
     ]
-    devices = ["cuda:{}".format(i) for i in range(4)]
+    devices = ["cuda:{}".format(i) for i in range(1, 4)]
 
-    model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, devices)
+    model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, devices + devices)
 
     # generating inputs
     inputs = torch.randn(batch_size, 3, image_w, image_h, dtype=next(net.parameters()).dtype)

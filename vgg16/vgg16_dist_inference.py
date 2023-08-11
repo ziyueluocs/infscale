@@ -28,6 +28,9 @@ image_w = 224
 image_h = 224
 
 
+def flat_func(x):
+    return torch.flatten(x, 1)
+
 def run_master(split_size, num_workers, partitions, shards, pre_trained = False):
 
     file = open("./vgg16_mild_uneven.csv", "a")
@@ -43,7 +46,7 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
     layers = [
         *net.features,
         net.avgpool,
-        lambda x: torch.flatten(x, 1),
+        flat_func,
         *net.classifier
     ]
     cuda_list = ["cuda:{}".format(i) for i in range(1, 4)]
