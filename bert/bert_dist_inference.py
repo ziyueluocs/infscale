@@ -558,14 +558,16 @@ if __name__=="__main__":
     open("./bert_mild_uneven.csv", "w") # flush the csv file
     original_stdout = sys.stdout
     sys.stdout = file
-    layer_partitions = [10]
-    combo = [[1, 2], [1, 1, 2], [1, 1, 2, 2], [1, 2, 2]]
+    repeat_times = 5
+    layer_partitions = [10, 12]
+    combo = [[1, 2, 3], [1, 1, 2, 3], [1, 1, 2, 2, 3, 3]]
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
     for placement in combo:
         world_size = len(placement) + 1
         print("Placement:", placement)
-        for split_size in [1, 2, 4, 8]:
+        for i in range(repeat_times):
+            split_size = 8
             # generate input
             inputs = bert_input_constructor(batch_size, seq_len, tokenizer)
 

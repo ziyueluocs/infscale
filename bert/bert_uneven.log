@@ -1,0 +1,18 @@
+Placement: [1, 2, 3]
+size of micro-batches = 8, end-to-end execution time = 20.32116937637329 s
+size of micro-batches = 8, end-to-end execution time = 21.224101066589355 s
+size of micro-batches = 8, end-to-end execution time = 21.25329065322876 s
+size of micro-batches = 8, end-to-end execution time = 20.427467107772827 s
+size of micro-batches = 8, end-to-end execution time = 21.108667850494385 s
+Placement: [1, 1, 2, 3]
+size of micro-batches = 8, end-to-end execution time = 20.300432682037354 s
+size of micro-batches = 8, end-to-end execution time = 21.3612802028656 s
+size of micro-batches = 8, end-to-end execution time = 21.21454930305481 s
+size of micro-batches = 8, end-to-end execution time = 21.247098922729492 s
+size of micro-batches = 8, end-to-end execution time = 21.328063488006592 s
+Placement: [1, 1, 2, 2, 3, 3]
+size of micro-batches = 8, end-to-end execution time = 22.155916452407837 s
+size of micro-batches = 8, end-to-end execution time = 23.06185030937195 s
+size of micro-batches = 8, end-to-end execution time = 22.876412630081177 s
+size of micro-batches = 8, end-to-end execution time = 23.079280614852905 s
+size of micro-batches = 8, end-to-end execution time = 23.030787229537964 s
