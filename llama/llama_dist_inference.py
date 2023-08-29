@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, json
 import time
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
@@ -216,11 +216,11 @@ def lm_head_output_handler(output_list):
             attentions=outputs[4],
         )
 
-num_batches = 1
-batch_size = 2
+num_batches = 10
+batch_size = 16
 seq_len = 128
 
-def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False):
+def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
     tokenizer = LlamaTokenizer.from_pretrained('openlm-research/open_llama_7b')
     # tokenizer.add_special_tokens({'pad_token': ' '})
     inputs = dict(tokenizer(inputs, return_tensors="pt", max_length=32, truncation=True))
@@ -241,14 +241,14 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
         LlamaLMHead(config, net.lm_head)
     ]
 
-    device_list = ["cuda:{}".format(i) for i in range(1, 4)]
+    device_list = ["cuda:{}".format(i) for i in range(0, 4)]
 
     model = RR_TransformerPipeline(config, split_size, ["worker{}".format(i + 1) for i in range(num_workers)], layers, partitions, shards, devices=device_list + device_list, output_handler=lm_head_output_handler)
     if not model.verify_parameter_consistency():
         print("Parameters not consistent!", flush=True)
         return
 
-    file = open("./llama_uneven.csv", "a")
+    file = open("./llama.csv", "a")
     original_stdout = sys.stdout
     sys.stdout = file
     
@@ -266,7 +266,7 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
     # baseline_outputs = net.generate(**inputs)
     # print("Baseline Outputs:", tokenizer.batch_decode(baseline_outputs, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0])
 
-def run_worker(rank, world_size, inputs, split_size, partitions, placement):
+def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_trained, logging):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -280,7 +280,7 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement):
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, pre_trained=True)
+        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, pre_trained=pre_trained, logging=logging)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -294,35 +294,39 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement):
     rpc.shutdown()
 
 if __name__=="__main__":
-    file = open("./llama_uneven.log", "w")
-    open("./llama_uneven.csv", "w") # flush the csv file
-    original_stdout = sys.stdout
-    sys.stdout = file
-    repeat_times = 1
-    layer_partitions = [10, 20]
-    combo = [[1, 2, 3]]
+    with open("llama_config.json", "r") as config_file:
+        config = json.load(config_file)
+        file = open("./llama.log", "w")
+        open("./llama.csv", "w") # flush the csv file
+        original_stdout = sys.stdout
+        sys.stdout = file
 
-    for placement in combo:
-        world_size = len(placement) + 1
-        print("Placement:", placement)
-        for i in range(repeat_times):
-            split_size = 1
-            # generate input
-            prompts = ['Q: What is the largest animal?\nA:',
-                       'Q: What is the smallest animal?\nA:',
-                       'Q: What is the prettiest animal?\nA:',
-                       'Q: What is the most ugly animal?\nA:',
-                       'Q: What is the fattest animal?\nA:',
-                       'Q: What is the most skinny animal?\nA:',
-                       'Q: What is the fastest animal?\nA:',
-                       'Q: What is the slowest animal?\nA:']
-            input_prompts = prompts[0:batch_size]
-            print("Inputs prompts:", input_prompts)
+        partitions = config["partitions"]
+        repeat_times = config["repeat_times"]
+        placements = config["placements"]
+        split_size = config["micro_batch_size"]
+        pre_trained = config["pre_trained"] == "True" if "pre_trained" in config else False
+        logging = config["logging"] == "True" if "logging" in config else False
+        for shards in placements:
+            world_size = len(shards) + 1
+            print("placement:", shards)
+            for i in range(repeat_times):
+                # generate input
+                prompts = ['Q: What is the largest animal?\nA:',
+                        'Q: What is the smallest animal?\nA:',
+                        'Q: What is the prettiest animal?\nA:',
+                        'Q: What is the most ugly animal?\nA:',
+                        'Q: What is the fattest animal?\nA:',
+                        'Q: What is the most skinny animal?\nA:',
+                        'Q: What is the fastest animal?\nA:',
+                        'Q: What is the slowest animal?\nA:']
+                input_prompts = [prompts[0]] * batch_size
+                print("Inputs prompts:", input_prompts)
 
-            # run inference process
-            tik = time.time()
-            mp.spawn(run_worker, args=(world_size, input_prompts, split_size, layer_partitions, placement), nprocs=world_size, join=True)
-            tok = time.time()
-            print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
+                # run inference process
+                tik = time.time()
+                mp.spawn(run_worker, args=(world_size, input_prompts, split_size, partitions, shards, pre_trained, logging), nprocs=world_size, join=True)
+                tok = time.time()
+                print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 
-    sys.stdout = original_stdout
+        sys.stdout = original_stdout

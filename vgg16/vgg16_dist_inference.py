@@ -1,4 +1,4 @@
-import os
+import os, json
 import threading
 import time
 import sys
@@ -31,9 +31,9 @@ image_h = 224
 def flat_func(x):
     return torch.flatten(x, 1)
 
-def run_master(split_size, num_workers, partitions, shards, pre_trained = False):
+def run_master(split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
 
-    file = open("./vgg16_3_6_uneven.csv", "a")
+    file = open("./vgg16.csv", "a")
     original_stdout = sys.stdout
     sys.stdout = file
 
@@ -57,7 +57,7 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
         # no partitioning
         model = net.to("cuda:0")
     else:
-        model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, devices + devices, logging=True)
+        model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, devices + devices, logging=logging)
     
     print("{}".format(list2csvcell(shards)),end=", ")
     tik = time.time()
@@ -75,7 +75,7 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
     sys.stdout = original_stdout
 
 
-def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = False):
+def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = False, logging = False):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -104,21 +104,27 @@ def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = F
 
 
 if __name__=="__main__":
-    file = open("./vgg16_3_6_uneven.log", "w")
-    open("./vgg16_3_6_uneven.csv", "w")
-    original_stdout = sys.stdout
-    sys.stdout = file
-    partitions = [3, 6]
-    repeat_times = 1
-    combo = [[1, 2, 3]]
-    for shards in combo:
-        print("Placement:", shards)
-        world_size = len(shards) + 1
-        for i in range(repeat_times):
-            split_size = 8
-            tik = time.time()
-            mp.spawn(run_worker, args=(world_size, split_size, partitions, shards, True), nprocs=world_size, join=True)
-            tok = time.time()
-            print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
+    with open("vgg16_config.json", "r") as config_file:
+        config = json.load(config_file)
+        file = open("./vgg16.log", "w")
+        open("./vgg16.csv", "w")
+        original_stdout = sys.stdout
+        sys.stdout = file
+        
+        partitions = config["partitions"]
+        repeat_times = config["repeat_times"]
+        placements = config["placements"]
+        split_size = config["micro_batch_size"]
+        pre_trained = config["pre_trained"] == "True" if "pre_trained" in config else False
+        logging = config["logging"] == "True" if "logging" in config else False
+        for shards in placements:
+            print("Placement:", shards)
+            world_size = len(shards) + 1
+            for i in range(repeat_times):
+                split_size = 8
+                tik = time.time()
+                mp.spawn(run_worker, args=(world_size, split_size, partitions, shards, True), nprocs=world_size, join=True)
+                tok = time.time()
+                print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 
-    sys.stdout = original_stdout
+        sys.stdout = original_stdout

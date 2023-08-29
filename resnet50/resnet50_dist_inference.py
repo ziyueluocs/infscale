@@ -1,4 +1,4 @@
-import os
+import os, json
 import threading
 import time
 import sys
@@ -22,7 +22,7 @@ from inference_pipeline import CNNShardBase, RR_CNNPipeline, list2csvcell
 #                   Run RPC Processes                   #
 #########################################################
 
-num_batches = 100
+num_batches = 10
 num_classes = 1000
 batch_size = 64
 image_w = 224
@@ -31,9 +31,9 @@ image_h = 224
 def flat_func(x):
     return torch.flatten(x, 1)
 
-def run_master(split_size, num_workers, partitions, shards, pre_trained = False):
+def run_master(split_size, num_workers, partitions, shards, devices, pre_trained = False, logging = False):
 
-    file = open("./resnet50_6_uneven.csv", "a")
+    file = open("./resnet50.csv", "a")
     original_stdout = sys.stdout
     sys.stdout = file
 
@@ -58,21 +58,23 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
         flat_func,
         net.fc
     ]
-    devices = ["cuda:{}".format(i) for i in range(0, 4)]
+    device_list = []
+    while len(device_list) < len(shards):
+        device_list += devices
     # generating inputs
     inputs = torch.randn(batch_size, 3, image_w, image_h, dtype=next(net.parameters()).dtype)
 
     if len(shards) == 0:
         # no partitioning
-        model = net.to("cuda:0")
+        model = net.to(devices[0])
     else:
-        model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, devices + devices, logging=True)
+        model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, device_list, logging=logging)
     
     print("{}".format(list2csvcell(shards)),end=", ")
     tik = time.time()
     for i in range(num_batches):
         if len(shards) == 0:
-            batch = inputs.to("cuda:0")
+            batch = inputs.to(devices[0])
         else:
             batch = inputs
 
@@ -84,7 +86,7 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False)
     sys.stdout = original_stdout
 
 
-def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = False):
+def run_worker(rank, world_size, split_size, partitions, shards, devices, pre_trained = False, logging = False):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -98,7 +100,7 @@ def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = F
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(split_size, num_workers=world_size - 1, partitions=partitions, shards=shards, pre_trained=pre_trained)
+        run_master(split_size, num_workers=world_size - 1, partitions=partitions, shards=shards, devices=devices, pre_trained=pre_trained, logging=logging)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -113,22 +115,27 @@ def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = F
 
 
 if __name__=="__main__":
-    file = open("./resnet50_6_uneven.log", "w")
-    open("./resnet50_6_uneven.csv", "w")
-    original_stdout = sys.stdout
-    sys.stdout = file
+    with open("resnet50_config.json", "r") as config_file:
+        config = json.load(config_file)
+        file = open("./resnet50.log", "w")
+        open("./resnet50.csv", "w")
+        original_stdout = sys.stdout
+        sys.stdout = file
 
-    partitions = [8]
-    repeat_times = 1
-    placements = [[1, 2]]
-    for shards in placements:
-        world_size = len(shards) + 1
-        print("Placement:", shards)
-        for i in range(repeat_times):
-            split_size = 8
-            tik = time.time()
-            mp.spawn(run_worker, args=(world_size, split_size, partitions, shards), nprocs=world_size, join=True)
-            tok = time.time()
-            print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
+        partitions = config["partitions"]
+        devices = config["devices"]
+        repeat_times = config["repeat_times"]
+        placements = config["placements"]
+        split_size = config["micro_batch_size"]
+        pre_trained = config["pre_trained"] == "True" if "pre_trained" in config else False
+        logging = config["logging"] == "True" if "logging" in config else False
+        for shards in placements:
+            world_size = len(shards) + 1
+            print("Placement:", shards)
+            for i in range(repeat_times):
+                tik = time.time()
+                mp.spawn(run_worker, args=(world_size, split_size, partitions, shards, devices, pre_trained, logging), nprocs=world_size, join=True)
+                tok = time.time()
+                print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 
-    sys.stdout = original_stdout
+        sys.stdout = original_stdout

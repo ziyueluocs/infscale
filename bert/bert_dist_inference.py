@@ -1,4 +1,4 @@
-import sys, os, time, random
+import sys, os, time, random, json
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
@@ -12,6 +12,10 @@ from torch.nn.parameter import Parameter
 from transformers import BertTokenizer, BertModel, BertForSequenceClassification
 from transformers.models.bert.modeling_bert import BertEmbeddings, BertPreTrainedModel, BertPooler, BertEncoder, BertLayer, BertConfig
 from transformers.models.bert.modeling_bert import BaseModelOutputWithPoolingAndCrossAttentions
+from transformers.modeling_utils import ModuleUtilsMixin
+
+sys.path.append(".")
+from inference_pipeline import list2csvcell, RR_TransformerPipeline, TransformerShardBase
 
 dtype2int_map = {
     torch.float: 0,
@@ -104,43 +108,101 @@ def bert_input_constructor(batch_size, seq_len, tokenizer, batch_num=1):
 #   11: all_self_attentions
 #   12: all_cross_attentions
 
-class BertShardBase(nn.Module):
-    def __init__(self, device, layers, index = None, *args, **kwargs):
-        super(BertShardBase, self).__init__()
-
-        self.lock = threading.Lock()
-        self.layers = [m.to(device) for m in layers]
-        self.device = device
-    
-    def forward(self, x_rref):
-        x = x_rref.to_here()
-        x = decode_tensors(x)
-        with self.lock:
-            for m in self.layers:
-                x = m(x)
-
-        for i in range(len(x)):
-            if isinstance(x[i], torch.Tensor):
-                x[i] = x[i].to("cpu")
-
-        x = encode_tensors(x)
-        return x
+class BertPreprocessLayer(nn.Module):
+    def __init__(self, config, dtype = torch.float32, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.config = config
+        self.dtype = dtype
 
     def parameter_rrefs(self):
         r"""
         Create one RRef for each parameter in the given local module, and return a
         list of RRefs.
         """
-        res = []
-        for l in self.layers:
-            res += l.parameter_rrefs()
-        return res
+        return []
 
-    def parameter_list(self):
-        res = []
-        for l in self.layers:
-            res += l.parameter_list()
-        return res
+    def get_extended_attention_mask(
+        self, attention_mask, input_shape: Tuple[int], device: torch.device = None, dtype: torch.float = None
+    ):
+        """
+        Makes broadcastable attention and causal masks so that future and masked tokens are ignored.
+
+        Arguments:
+            attention_mask (`torch.Tensor`):
+                Mask with ones indicating tokens to attend to, zeros for tokens to ignore.
+            input_shape (`Tuple[int]`):
+                The shape of the input to the model.
+
+        Returns:
+            `torch.Tensor` The extended attention mask, with a the same dtype as `attention_mask.dtype`.
+        """
+        if dtype is None:
+            dtype = self.dtype
+
+        if not (attention_mask.dim() == 2 and self.config.is_decoder):
+            # show warning only if it won't be shown in `create_extended_attention_mask_for_decoder`
+            if device is not None:
+                pass
+        # We can provide a self-attention mask of dimensions [batch_size, from_seq_length, to_seq_length]
+        # ourselves in which case we just need to make it broadcastable to all heads.
+        if attention_mask.dim() == 3:
+            extended_attention_mask = attention_mask[:, None, :, :]
+        elif attention_mask.dim() == 2:
+            # Provided a padding mask of dimensions [batch_size, seq_length]
+            # - if the model is a decoder, apply a causal mask in addition to the padding mask
+            # - if the model is an encoder, make the mask broadcastable to [batch_size, num_heads, seq_length, seq_length]
+            if self.config.is_decoder:
+                extended_attention_mask = ModuleUtilsMixin.create_extended_attention_mask_for_decoder(
+                    input_shape, attention_mask, device
+                )
+            else:
+                extended_attention_mask = attention_mask[:, None, None, :]
+        else:
+            raise ValueError(
+                f"Wrong shape for input_ids (shape {input_shape}) or attention_mask (shape {attention_mask.shape})"
+            )
+
+        # Since attention_mask is 1.0 for positions we want to attend and 0.0 for
+        # masked positions, this operation will create a tensor which is 0.0 for
+        # positions we want to attend and the dtype's smallest value for masked positions.
+        # Since we are adding it to the raw scores before the softmax, this is
+        # effectively the same as removing these entirely.
+        extended_attention_mask = extended_attention_mask.to(dtype=dtype)  # fp16 compatibility
+        extended_attention_mask = (1.0 - extended_attention_mask) * torch.finfo(dtype).min
+        return extended_attention_mask
+    
+    def forward(self, inputs):
+        input_ids = inputs[0] if inputs[0] != None else None
+        token_type_ids = inputs[1] if inputs[1] != None else None
+        inputs_embeds = inputs[3] if inputs[3] != None else None
+        attention_mask = inputs[6] if inputs[6] != None else None
+        head_mask = inputs[7] if inputs[7] != None else None
+
+        if input_ids is not None and inputs_embeds is not None:
+            raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
+        elif input_ids is not None:
+            input_shape = input_ids.size()
+        elif inputs_embeds is not None:
+            input_shape = inputs_embeds.size()[:-1]
+        else:
+            raise ValueError("You have to specify either input_ids or inputs_embeds")
+
+        batch_size, seq_length = input_shape
+
+        if attention_mask is None:
+            attention_mask = torch.ones(((batch_size, seq_length)), device="cpu")
+
+        if token_type_ids is None:
+            token_type_ids = torch.zeros(input_shape, dtype=torch.long, device="cpu")
+
+        # We can provide a self-attention mask of dimensions [batch_size, from_seq_length, to_seq_length]
+        # ourselves in which case we just need to make it broadcastable to all heads.
+        extended_attention_mask: torch.Tensor = self.get_extended_attention_mask(attention_mask, input_shape)
+
+        inputs[1] = token_type_ids
+        inputs[6] = extended_attention_mask
+
+        return inputs
 
 class BertEmbeddingLayer(nn.Module):
     def __init__(self, config, embedding = None, device = "cpu", *args, **kwargs) -> None:
@@ -315,7 +377,7 @@ class RRDistBertModel(BertPreTrainedModel):
             print("Starting {} with shard_id:{}".format(workers[i], shard_id), flush=True)
             rref = rpc.remote(
                 workers[i],
-                BertShardBase,
+                TransformerShardBase,
                 args = (devices[i], shard_layers, i) + args,
                 kwargs = kwargs
             )
@@ -489,7 +551,7 @@ num_batches = 100
 batch_size = 24
 seq_len = 128
 
-def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False, n_layers = 12):
+def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
 
     config = BertConfig()
     if pre_trained == True:
@@ -499,32 +561,46 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
     net.eval()
     
     layers = [
+        BertPreprocessLayer(config),
         BertEmbeddingLayer(config, embedding=net.embeddings),
-        *[BertEncoderLayer(config, i, encoder=net.encoder.layer[i]) for i in range(n_layers)],
+        *[BertEncoderLayer(config, i, encoder=net.encoder.layer[i]) for i in range(config.num_hidden_layers)],
         BertPoolerLayer(config, pooler=net.pooler)
     ]
 
-    device_list = ["cuda:{}".format(i) for i in range(1, 4)]
-    model = RRDistBertModel(config, split_size, ["worker{}".format(i + 1) for i in range(num_workers)], layers, partitions, shards, devices=device_list + device_list)
-    if not model.verify_parameter_consistency():
-        print("Parameters not consistent!", flush=True)
-        return
+    device_list = ["cuda:{}".format(i) for i in range(0, 4)]
 
-    file = open("./bert_mild_uneven.csv", "a")
+    if len(shards) == 0:
+        # no partitioning
+        model = net.to("cuda:0")
+    else:
+        model = RR_TransformerPipeline(config, split_size, ["worker{}".format(i + 1) for i in range(num_workers)], layers, partitions, shards, devices=device_list + device_list)
+
+        if not model.verify_parameter_consistency():
+            print("Parameters not consistent!", flush=True)
+            return
+
+    file = open("./bert.csv", "a")
     original_stdout = sys.stdout
     sys.stdout = file
     
-    print("{}".format(shards),end=", ", flush=True)
+    print("{}".format(list2csvcell(shards)),end=", ", flush=True)
     tik = time.time()
     for i in range(num_batches):
-        outputs = model(**inputs)
+        batch = dict()
+        if len(shards) == 0:
+            for k in inputs:
+                batch[k] = inputs[k].to("cuda:0")
+        else:
+            batch = inputs
+
+        outputs = model(**batch)
 
     tok = time.time()
     print(f"{split_size}, {tok - tik}, {(num_batches * batch_size) / (tok - tik)}")
 
     sys.stdout = original_stdout
 
-def run_worker(rank, world_size, inputs, split_size, partitions, placement):
+def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_trained = False, logging = False):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -553,27 +629,33 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement):
 
 
 if __name__=="__main__":
-    file = open("./bert_mild_uneven.log", "w")
-    open("./bert_mild_uneven.csv", "w") # flush the csv file
-    original_stdout = sys.stdout
-    sys.stdout = file
-    repeat_times = 5
-    layer_partitions = [10, 12]
-    combo = [[1, 2, 3], [1, 1, 2, 3], [1, 1, 2, 2, 3, 3]]
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    with open("bert_config.json", "r") as config_file:
+        config = json.load(config_file)
+        file = open("./bert.log", "w")
+        open("./bert.csv", "w") # flush the csv file
+        original_stdout = sys.stdout
+        sys.stdout = file
+        
 
-    for placement in combo:
-        world_size = len(placement) + 1
-        print("Placement:", placement)
-        for i in range(repeat_times):
-            split_size = 8
-            # generate input
-            inputs = bert_input_constructor(batch_size, seq_len, tokenizer)
+        partitions = config["partitions"]
+        repeat_times = config["repeat_times"]
+        placements = config["placements"]
+        split_size = config["micro_batch_size"]
+        pre_trained = config["pre_trained"] == "True" if "pre_trained" in config else False
+        logging = config["logging"] == "True" if "logging" in config else False
+        tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
-            # run inference process
-            tik = time.time()
-            mp.spawn(run_worker, args=(world_size, inputs, split_size, layer_partitions, placement), nprocs=world_size, join=True)
-            tok = time.time()
-            print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
+        for shards in placements:
+            world_size = len(shards) + 1
+            print("Placement:", shards)
+            for i in range(repeat_times):
+                # generate input
+                inputs = bert_input_constructor(batch_size, seq_len, tokenizer)
 
-    sys.stdout = original_stdout
+                # run inference process
+                tik = time.time()
+                mp.spawn(run_worker, args=(world_size, inputs, split_size, partitions, shards, pre_trained, logging), nprocs=world_size, join=True)
+                tok = time.time()
+                print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
+
+        sys.stdout = original_stdout
