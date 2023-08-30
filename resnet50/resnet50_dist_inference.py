@@ -1,4 +1,4 @@
-import os, json
+import os, json, yaml
 import threading
 import time
 import sys
@@ -22,7 +22,7 @@ from inference_pipeline import CNNShardBase, RR_CNNPipeline, list2csvcell
 #                   Run RPC Processes                   #
 #########################################################
 
-num_batches = 10
+num_batches = 100
 num_classes = 1000
 batch_size = 64
 image_w = 224
@@ -115,8 +115,8 @@ def run_worker(rank, world_size, split_size, partitions, shards, devices, pre_tr
 
 
 if __name__=="__main__":
-    with open("resnet50_config.json", "r") as config_file:
-        config = json.load(config_file)
+    with open("resnet50_config.yaml", "r") as config_file:
+        config = yaml.safe_load(config_file)
         file = open("./resnet50.log", "w")
         open("./resnet50.csv", "w")
         original_stdout = sys.stdout

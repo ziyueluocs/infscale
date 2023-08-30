@@ -1,4 +1,4 @@
-import sys, os, time, random, json
+import sys, os, time, json, yaml
 import torch
 import torch.nn as nn
 import torch.multiprocessing as mp
@@ -551,7 +551,7 @@ num_batches = 100
 batch_size = 24
 seq_len = 128
 
-def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
+def run_master(inputs, split_size, num_workers, partitions, shards, devices, pre_trained = False, logging = False):
 
     config = BertConfig()
     if pre_trained == True:
@@ -567,7 +567,7 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
         BertPoolerLayer(config, pooler=net.pooler)
     ]
 
-    device_list = ["cuda:{}".format(i) for i in range(0, 4)]
+    device_list = devices
 
     if len(shards) == 0:
         # no partitioning
@@ -600,7 +600,7 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
 
     sys.stdout = original_stdout
 
-def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_trained = False, logging = False):
+def run_worker(rank, world_size, inputs, split_size, partitions, placement, devices, pre_trained = False, logging = False):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -614,7 +614,7 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, pre_trained=True)
+        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, devices=devices, pre_trained=pre_trained, logging=logging)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -629,8 +629,8 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_
 
 
 if __name__=="__main__":
-    with open("bert_config.json", "r") as config_file:
-        config = json.load(config_file)
+    with open("bert_config.yaml", "r") as config_file:
+        config = yaml.safe_load(config_file)
         file = open("./bert.log", "w")
         open("./bert.csv", "w") # flush the csv file
         original_stdout = sys.stdout
@@ -638,6 +638,7 @@ if __name__=="__main__":
         
 
         partitions = config["partitions"]
+        devices = config["devices"]
         repeat_times = config["repeat_times"]
         placements = config["placements"]
         split_size = config["micro_batch_size"]
@@ -654,7 +655,7 @@ if __name__=="__main__":
 
                 # run inference process
                 tik = time.time()
-                mp.spawn(run_worker, args=(world_size, inputs, split_size, partitions, shards, pre_trained, logging), nprocs=world_size, join=True)
+                mp.spawn(run_worker, args=(world_size, inputs, split_size, partitions, shards, devices, pre_trained, logging), nprocs=world_size, join=True)
                 tok = time.time()
                 print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 

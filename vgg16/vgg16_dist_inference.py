@@ -1,4 +1,4 @@
-import os, json
+import os, json, yaml
 import threading
 import time
 import sys
@@ -31,7 +31,7 @@ image_h = 224
 def flat_func(x):
     return torch.flatten(x, 1)
 
-def run_master(split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
+def run_master(split_size, num_workers, partitions, shards, devices, pre_trained = False, logging = False):
 
     file = open("./vgg16.csv", "a")
     original_stdout = sys.stdout
@@ -49,7 +49,6 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False,
         flat_func,
         *net.classifier
     ]
-    devices = ["cuda:{}".format(i) for i in range(0, 4)]
     # generating inputs
     inputs = torch.randn(batch_size, 3, image_w, image_h)
 
@@ -75,7 +74,7 @@ def run_master(split_size, num_workers, partitions, shards, pre_trained = False,
     sys.stdout = original_stdout
 
 
-def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = False, logging = False):
+def run_worker(rank, world_size, split_size, partitions, shards, devices, pre_trained = False, logging = False):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -89,7 +88,7 @@ def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = F
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(split_size, num_workers=world_size - 1, partitions=partitions, shards=shards, pre_trained=pre_trained)
+        run_master(split_size, num_workers=world_size - 1, partitions=partitions, shards=shards, devices=devices, pre_trained=pre_trained, logging=logging)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -104,14 +103,15 @@ def run_worker(rank, world_size, split_size, partitions, shards, pre_trained = F
 
 
 if __name__=="__main__":
-    with open("vgg16_config.json", "r") as config_file:
-        config = json.load(config_file)
+    with open("vgg16_config.yaml", "r") as config_file:
+        config = yaml.safe_load(config_file)
         file = open("./vgg16.log", "w")
         open("./vgg16.csv", "w")
         original_stdout = sys.stdout
         sys.stdout = file
         
         partitions = config["partitions"]
+        devices = config["devices"]
         repeat_times = config["repeat_times"]
         placements = config["placements"]
         split_size = config["micro_batch_size"]
@@ -121,9 +121,8 @@ if __name__=="__main__":
             print("Placement:", shards)
             world_size = len(shards) + 1
             for i in range(repeat_times):
-                split_size = 8
                 tik = time.time()
-                mp.spawn(run_worker, args=(world_size, split_size, partitions, shards, True), nprocs=world_size, join=True)
+                mp.spawn(run_worker, args=(world_size, split_size, partitions, shards, devices, pre_trained, logging), nprocs=world_size, join=True)
                 tok = time.time()
                 print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 

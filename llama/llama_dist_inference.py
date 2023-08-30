@@ -1,4 +1,4 @@
-import sys, os, json
+import sys, os, json, yaml
 import time
 os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 import torch
@@ -220,7 +220,7 @@ num_batches = 10
 batch_size = 16
 seq_len = 128
 
-def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained = False, logging = False):
+def run_master(inputs, split_size, num_workers, partitions, shards, devices, pre_trained = False, logging = False):
     tokenizer = LlamaTokenizer.from_pretrained('openlm-research/open_llama_7b')
     # tokenizer.add_special_tokens({'pad_token': ' '})
     inputs = dict(tokenizer(inputs, return_tensors="pt", max_length=32, truncation=True))
@@ -241,7 +241,7 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
         LlamaLMHead(config, net.lm_head)
     ]
 
-    device_list = ["cuda:{}".format(i) for i in range(0, 4)]
+    device_list = devices
 
     model = RR_TransformerPipeline(config, split_size, ["worker{}".format(i + 1) for i in range(num_workers)], layers, partitions, shards, devices=device_list + device_list, output_handler=lm_head_output_handler)
     if not model.verify_parameter_consistency():
@@ -266,7 +266,7 @@ def run_master(inputs, split_size, num_workers, partitions, shards, pre_trained 
     # baseline_outputs = net.generate(**inputs)
     # print("Baseline Outputs:", tokenizer.batch_decode(baseline_outputs, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0])
 
-def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_trained, logging):
+def run_worker(rank, world_size, inputs, split_size, partitions, placement, devices, pre_trained, logging):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '29500'
 
@@ -280,7 +280,7 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_
             world_size=world_size,
             rpc_backend_options=options
         )
-        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, pre_trained=pre_trained, logging=logging)
+        run_master(inputs, split_size, num_workers=world_size - 1, partitions=partitions, shards=placement, devices=devices, pre_trained=pre_trained, logging=logging)
     else:
         rpc.init_rpc(
             f"worker{rank}",
@@ -294,14 +294,15 @@ def run_worker(rank, world_size, inputs, split_size, partitions, placement, pre_
     rpc.shutdown()
 
 if __name__=="__main__":
-    with open("llama_config.json", "r") as config_file:
-        config = json.load(config_file)
+    with open("llama_config.yaml", "r") as config_file:
+        config = yaml.safe_load(config_file)
         file = open("./llama.log", "w")
         open("./llama.csv", "w") # flush the csv file
         original_stdout = sys.stdout
         sys.stdout = file
 
         partitions = config["partitions"]
+        devices = config["devices"]
         repeat_times = config["repeat_times"]
         placements = config["placements"]
         split_size = config["micro_batch_size"]
@@ -325,7 +326,7 @@ if __name__=="__main__":
 
                 # run inference process
                 tik = time.time()
-                mp.spawn(run_worker, args=(world_size, input_prompts, split_size, partitions, shards, pre_trained, logging), nprocs=world_size, join=True)
+                mp.spawn(run_worker, args=(world_size, input_prompts, split_size, partitions, shards, devices, pre_trained, logging), nprocs=world_size, join=True)
                 tok = time.time()
                 print(f"size of micro-batches = {split_size}, end-to-end execution time = {tok - tik} s")
 
