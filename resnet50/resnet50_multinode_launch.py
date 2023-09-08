@@ -5,27 +5,24 @@ def launch(world_size, split_size, partitions, shards, devices, pre_trained, log
     args = [
         json.dumps(partitions),
         json.dumps(shards),
-        json.dumps(devices),
+        json.dumps(devices).replace("\"", '\\"'),
         "--micro_batch_size", str(split_size),
         "--pre_trained", str(int(pre_trained)),
         "--logging", str(int(pre_trained))
     ]
-    host_ip = "10.20.1.50"
-    host_port = "10819"
-    node_list = ["10.20.1.15"]
+    host = "10.200.103.227"
+    host_port = "54389"
+
+    node_list = ["eti-research-dev7"]
     for i, node in enumerate(node_list):
-        subprocess.Popen(["ssh", "changwu@" + node, "\"", "cd", "LLM-Inference;","torchrun", "--nnodes=2",f"--node-rank={i + 1}", "--nproc-per-node=4", "--rdzv-id=819", "--rdzv-backend=c10d", f"--rdzv-endpoint={host_ip}:{host_port}",  "resnet50/resnet50_multinode_inference.py", *args, "\""])
-    subprocess.run(["torchrun", "--nnodes=2", "--node-rank=0", "--nproc-per-node=4", "--rdzv-id=819", "--rdzv-backend=c10d", f"--rdzv-endpoint={host_ip}:{host_port}", "resnet50/resnet50_multinode_inference.py", *args])
-    # args = [
-    #     "--micro_batch_size", str(split_size),
-    #     "--partitions", "\"" + json.dumps(partitions).replace("\"", "\\\"") + "\"",
-    #     "--shards", "\"" + json.dumps(shards).replace("\"", "\\\"") + "\"",
-    #     "--devices", "\"" + json.dumps(devices).replace("\"", "\\\"") + "\"",
-    #     "--pre_trained", str(int(pre_trained)),
-    #     "--logging", str(int(pre_trained))
-    # ]
-    # args = " ".join(args)
-    # subprocess.Popen(f"torchrun --standalone --nnodes=1 --nproc-per-node={world_size} resnet50/resnet50_multinode_inference.py {args}")
+        torchrun_cmd = f"torchrun --nnodes=2 --node-rank={i + 1} --nproc-per-node=3 --rdzv-id=819 --rdzv-backend=c10d --rdzv-endpoint={host}:{host_port} resnet50/resnet50_multinode_inference.py \"{args[0]}\" \"{args[1]}\" \"{args[2]}\" " + " ".join(args[3:])
+        cmd = f"ssh changwu@{node} " + "\"" + "source .profile; cd LLM-Inference;" + torchrun_cmd  + "\""
+        print("Execute on {}:".format(node), cmd)
+        subprocess.Popen(cmd, shell=True)
+
+    torchrun_cmd = f"torchrun --nnodes=2 --node-rank=0 --nproc-per-node=3 --rdzv-id=819 --rdzv-backend=c10d --rdzv-endpoint={host}:{host_port} resnet50/resnet50_multinode_inference.py \"{args[0]}\" \"{args[1]}\" \"{args[2]}\" " + " ".join(args[3:])
+    print("Execute on localhost:", torchrun_cmd)
+    subprocess.run(torchrun_cmd, shell=True)
 
 if __name__=="__main__":
     with open("resnet50_config.yaml", "r") as config_file:
