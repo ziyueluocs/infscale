@@ -12,7 +12,7 @@ from torch.distributed.rpc import RRef
 from torchvision.models.resnet import resnet50, ResNet50_Weights
 
 sys.path.append(".")
-from inference_pipeline import CNNShardBase, RR_CNNPipeline, list2csvcell
+from optim_inference_pipeline import CNNPipeline, list2csvcell
 
 
 #########################################################
@@ -29,10 +29,6 @@ def flat_func(x):
     return torch.flatten(x, 1)
 
 def run_master(split_size, num_workers, partitions, shards, devices, pre_trained = False, logging = False):
-
-    file = open("./resnet50.csv", "a")
-    original_stdout = sys.stdout
-    sys.stdout = file
 
     if pre_trained == True:
         net = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
@@ -65,7 +61,11 @@ def run_master(split_size, num_workers, partitions, shards, devices, pre_trained
         # no partitioning
         model = net.to(devices[0])
     else:
-        model = RR_CNNPipeline(split_size, workers, layers, partitions, shards, device_list, logging=logging)
+        model = CNNPipeline(split_size, workers, layers, partitions, shards, device_list, logging=logging, backend="gloo")
+    
+    file = open("./resnet50.csv", "a")
+    original_stdout = sys.stdout
+    sys.stdout = file
     
     print("{}".format(list2csvcell(shards)),end=", ")
     tik = time.time()
@@ -89,6 +89,8 @@ def run_worker(rank, world_size, split_size, partitions, shards, devices, pre_tr
 
     # Higher timeout is added to accommodate for kernel compilation time in case of ROCm.
     options = rpc.TensorPipeRpcBackendOptions(num_worker_threads=256, rpc_timeout=300)
+
+    torch.distributed.init_process_group(backend="gloo", rank=rank, world_size=world_size)
 
     if rank == 0:
         rpc.init_rpc(
