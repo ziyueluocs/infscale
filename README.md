@@ -14,7 +14,7 @@ profiling/ -- the directory that holds the scripts to do profiling for ML models
 ```
 
 ## PyTorch RPC-based implementation of LLM pipeline
-A prototype implementation that uses PyTorch RPC as the communication framework to construct a pipeline for ML models.
+A prototype implementation that uses [PyTorch RPC](https://pytorch.org/docs/stable/rpc.html) as the communication framework to construct a pipeline for ML models.
 The *pipeline* is abstracted as a new ML model that wraps the original ML model and follows the original computation logic, but it uses a different computation process and aims to achieve better throughput in terms of samples processed per second.
 The pipeline contains several *shards* each of which holds a *partition* of the original ML model.
 All shards that bear the same partition are recognized as replicas of each other and they together form a *stage* of the pipeline.
@@ -37,4 +37,21 @@ The class that implements the abstraction of a shard of pipelined Transformer NN
 class RR_TransformerPipeline
 ```
 The class that implements the abstraction of a pipeline for Transformer NN models.
+
+## Optimized implementation of LLM pipeline (Development Ongoing)
+A prototype implementation that is renovated from the PyTorch RPC-based implementation with optimizations aiming to improve performance.
+Although the instances of pipeline classes still use PyTorch RPC to configure and control shards managed by the pipeline in this implementation, the data communications between shards are using [PyTorch distributed p2p communication primitives](https://pytorch.org/docs/stable/distributed.html#point-to-point-communication).
+
+```
+class CNNShardBase
+```
+The class implements the abstraction of a shard of pipelined Convolutional Neural Networks.
+```
+class CNN PipelineCollector
+```
+This class implements a collector that receives unordered results of mini-batches from shards of the last stage of the pipeline and reorders them to obtain the consistent result of the input batch data. 
+```
+class CNNPipeline
+```
+The class implements the abstraction of a pipeline for Convolutional Neural Networks.
 
