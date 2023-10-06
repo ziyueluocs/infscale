@@ -14,7 +14,7 @@ from torch.distributed.rpc import RRef
 from torch.nn.parameter import Parameter
 from transformers import PreTrainedModel
 
-from infscale import get_logger, setup_logger
+from infscale import get_logger
 
 ###########################################################################################
 # Helper Functions
