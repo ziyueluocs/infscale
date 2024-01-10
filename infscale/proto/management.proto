@@ -4,16 +4,14 @@ package management;
 
 import "google/protobuf/empty.proto";
 
-enum ResourceType {
-  CPU = 0;
-  GPU = 1;
+enum MemoryType {
+  RAM = 0;  // memory for CPU
+  VRAM = 1; // memory for GPU
 }
 
-enum GpuSubType {
-  UNKNOWN = 0; // set in case of resource type is CPU or none of the below sub types
-  T4 = 1;
-  V100 = 2;
-  A100 = 3;
+enum ComputeType {
+  CPU = 0;
+  GPU = 1;
 }
 
 // route for management between controller and agent
@@ -44,30 +42,41 @@ message RegRes {
 }
 
 // status contains details about resources and workers managed by an agent
-// TODO: for now, we keep this as byte stream; revisit this
-//       once manifest's structure is confirmed
 message Status {
   string id = 1; // agent's id
-  repeated ResourceStatus resource_statuses = 2;
-  repeated WorkerStatus worker_statuses = 3;
+  repeated ComputeStatus compute_statuses = 2;
+  repeated MemoryStatus memory_statuses = 3;
+  repeated WorkerStatus worker_statuses = 4;
 }
 
-message ResourceID {
-  ResourceType type = 1; // CPU or GPU
+message ComputeID {
+  ComputeType type = 1; // CPU or GPU
   int32 id = 2; // resource id of the given type
                 // 0: any in case of CPU;
                 // 1...n: specific device index for a given type
                 // CPU type has a specific id other than 0, it means cpu pinning
 }
 
-// resourcestatus contains status about resources managed by an agent
-message ResourceStatus {
-  ResourceID rid = 1; // Resource identifier
-  GpuSubType sub_type = 2;
-  bool available = 3; // specify whether the resource is up or down
-  bool used = 4; // specify whether the resource is used or not
-  int32 used_memory = 5; // this would be an average value
-  int32 total_memory = 6;
+message MemoryID {
+  MemoryType type = 1; // RAM or VRAM
+  int32 id = 2; // resource id of the given type
+                // 0: default value for RAM
+                // 1...n: specific device index for a given type
+                // since GPU is coupled with VRAM, GPU id and VRAM id should be matched
+}
+
+// computestatus contains status information about compute
+message ComputeStatus {
+  ComputeID cid = 1; // Compute identifier
+  string sub_type = 2; // in case of GPU, GPU sub type is specified
+  bool used = 3; // specify whether the resource is used or not
+}
+
+// memorystatus contains status information about memory
+message MemoryStatus {
+  MemoryID mid = 1; // Memory identifier
+  int32 used = 2; // this would be an average value
+  int32 total = 3;
 }
 
 // workerstatus contains information about worker's status
@@ -76,8 +85,9 @@ message WorkerStatus {
                        // deploy id is an identifier for one deployment
   int32 worker_id = 2; // worker id within deployment; each id is unique within one deployment
   bool healthy = 3;    // true or false
-  ResourceID rid = 4;  // resource id specifies computation device that worker is running
-  Statistics statistics = 5;
+  ComputeID cid = 4;   // compute id specifies computation device that worker is running
+  MemoryID mid = 5;    // memory id specifies memory device; in case of GPU, it's the same sas compute id
+  Statistics statistics = 6;
 }
 
 // statistics contains 

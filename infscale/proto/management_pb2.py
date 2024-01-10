@@ -15,35 +15,39 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10management.proto\x12\nmanagement\x1a\x1bgoogle/protobuf/empty.proto\"\x15\n\x07\x41gentID\x12\n\n\x02id\x18\x01 \x01(\t\"\x14\n\x06RegReq\x12\n\n\x02id\x18\x01 \x01(\t\"(\n\x06RegRes\x12\x0e\n\x06status\x18\x01 \x01(\x08\x12\x0e\n\x06reason\x18\x02 \x01(\t\"~\n\x06Status\x12\n\n\x02id\x18\x01 \x01(\t\x12\x35\n\x11resource_statuses\x18\x02 \x03(\x0b\x32\x1a.management.ResourceStatus\x12\x31\n\x0fworker_statuses\x18\x03 \x03(\x0b\x32\x18.management.WorkerStatus\"@\n\nResourceID\x12&\n\x04type\x18\x01 \x01(\x0e\x32\x18.management.ResourceType\x12\n\n\x02id\x18\x02 \x01(\x05\"\xab\x01\n\x0eResourceStatus\x12#\n\x03rid\x18\x01 \x01(\x0b\x32\x16.management.ResourceID\x12(\n\x08sub_type\x18\x02 \x01(\x0e\x32\x16.management.GpuSubType\x12\x11\n\tavailable\x18\x03 \x01(\x08\x12\x0c\n\x04used\x18\x04 \x01(\x08\x12\x13\n\x0bused_memory\x18\x05 \x01(\x05\x12\x14\n\x0ctotal_memory\x18\x06 \x01(\x05\"\x96\x01\n\x0cWorkerStatus\x12\x11\n\tdeploy_id\x18\x01 \x01(\x05\x12\x11\n\tworker_id\x18\x02 \x01(\x05\x12\x0f\n\x07healthy\x18\x03 \x01(\x08\x12#\n\x03rid\x18\x04 \x01(\x0b\x32\x16.management.ResourceID\x12*\n\nstatistics\x18\x05 \x01(\x0b\x32\x16.management.Statistics\"4\n\nStatistics\x12\x12\n\nthroughput\x18\x01 \x01(\x05\x12\x12\n\nlatency_ms\x18\x02 \x01(\x05\"\x1b\n\x08Manifest\x12\x0f\n\x07payload\x18\x01 \x01(\x0c* \n\x0cResourceType\x12\x07\n\x03\x43PU\x10\x00\x12\x07\n\x03GPU\x10\x01*5\n\nGpuSubType\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x06\n\x02T4\x10\x01\x12\x08\n\x04V100\x10\x02\x12\x08\n\x04\x41\x31\x30\x30\x10\x03\x32\xf3\x01\n\x0fManagementRoute\x12\x34\n\x08register\x12\x12.management.RegReq\x1a\x12.management.RegRes\"\x00\x12:\n\theartbeat\x12\x13.management.AgentID\x1a\x16.google.protobuf.Empty\"\x00\x12\x36\n\x06update\x12\x12.management.Status\x1a\x16.google.protobuf.Empty\"\x00\x12\x36\n\x05\x66\x65tch\x12\x13.management.AgentID\x1a\x14.management.Manifest\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10management.proto\x12\nmanagement\x1a\x1bgoogle/protobuf/empty.proto\"\x15\n\x07\x41gentID\x12\n\n\x02id\x18\x01 \x01(\t\"\x14\n\x06RegReq\x12\n\n\x02id\x18\x01 \x01(\t\"(\n\x06RegRes\x12\x0e\n\x06status\x18\x01 \x01(\x08\x12\x0e\n\x06reason\x18\x02 \x01(\t\"\xaf\x01\n\x06Status\x12\n\n\x02id\x18\x01 \x01(\t\x12\x33\n\x10\x63ompute_statuses\x18\x02 \x03(\x0b\x32\x19.management.ComputeStatus\x12\x31\n\x0fmemory_statuses\x18\x03 \x03(\x0b\x32\x18.management.MemoryStatus\x12\x31\n\x0fworker_statuses\x18\x04 \x03(\x0b\x32\x18.management.WorkerStatus\">\n\tComputeID\x12%\n\x04type\x18\x01 \x01(\x0e\x32\x17.management.ComputeType\x12\n\n\x02id\x18\x02 \x01(\x05\"<\n\x08MemoryID\x12$\n\x04type\x18\x01 \x01(\x0e\x32\x16.management.MemoryType\x12\n\n\x02id\x18\x02 \x01(\x05\"S\n\rComputeStatus\x12\"\n\x03\x63id\x18\x01 \x01(\x0b\x32\x15.management.ComputeID\x12\x10\n\x08sub_type\x18\x02 \x01(\t\x12\x0c\n\x04used\x18\x03 \x01(\x08\"N\n\x0cMemoryStatus\x12!\n\x03mid\x18\x01 \x01(\x0b\x32\x14.management.MemoryID\x12\x0c\n\x04used\x18\x02 \x01(\x05\x12\r\n\x05total\x18\x03 \x01(\x05\"\xb8\x01\n\x0cWorkerStatus\x12\x11\n\tdeploy_id\x18\x01 \x01(\x05\x12\x11\n\tworker_id\x18\x02 \x01(\x05\x12\x0f\n\x07healthy\x18\x03 \x01(\x08\x12\"\n\x03\x63id\x18\x04 \x01(\x0b\x32\x15.management.ComputeID\x12!\n\x03mid\x18\x05 \x01(\x0b\x32\x14.management.MemoryID\x12*\n\nstatistics\x18\x06 \x01(\x0b\x32\x16.management.Statistics\"4\n\nStatistics\x12\x12\n\nthroughput\x18\x01 \x01(\x05\x12\x12\n\nlatency_ms\x18\x02 \x01(\x05\"\x1b\n\x08Manifest\x12\x0f\n\x07payload\x18\x01 \x01(\x0c*\x1f\n\nMemoryType\x12\x07\n\x03RAM\x10\x00\x12\x08\n\x04VRAM\x10\x01*\x1f\n\x0b\x43omputeType\x12\x07\n\x03\x43PU\x10\x00\x12\x07\n\x03GPU\x10\x01\x32\xf3\x01\n\x0fManagementRoute\x12\x34\n\x08register\x12\x12.management.RegReq\x1a\x12.management.RegRes\"\x00\x12:\n\theartbeat\x12\x13.management.AgentID\x1a\x16.google.protobuf.Empty\"\x00\x12\x36\n\x06update\x12\x12.management.Status\x1a\x16.google.protobuf.Empty\"\x00\x12\x36\n\x05\x66\x65tch\x12\x13.management.AgentID\x1a\x14.management.Manifest\"\x00\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'management_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_RESOURCETYPE']._serialized_start=752
-  _globals['_RESOURCETYPE']._serialized_end=784
-  _globals['_GPUSUBTYPE']._serialized_start=786
-  _globals['_GPUSUBTYPE']._serialized_end=839
+  _globals['_MEMORYTYPE']._serialized_start=887
+  _globals['_MEMORYTYPE']._serialized_end=918
+  _globals['_COMPUTETYPE']._serialized_start=920
+  _globals['_COMPUTETYPE']._serialized_end=951
   _globals['_AGENTID']._serialized_start=61
   _globals['_AGENTID']._serialized_end=82
   _globals['_REGREQ']._serialized_start=84
   _globals['_REGREQ']._serialized_end=104
   _globals['_REGRES']._serialized_start=106
   _globals['_REGRES']._serialized_end=146
-  _globals['_STATUS']._serialized_start=148
-  _globals['_STATUS']._serialized_end=274
-  _globals['_RESOURCEID']._serialized_start=276
-  _globals['_RESOURCEID']._serialized_end=340
-  _globals['_RESOURCESTATUS']._serialized_start=343
-  _globals['_RESOURCESTATUS']._serialized_end=514
-  _globals['_WORKERSTATUS']._serialized_start=517
-  _globals['_WORKERSTATUS']._serialized_end=667
-  _globals['_STATISTICS']._serialized_start=669
-  _globals['_STATISTICS']._serialized_end=721
-  _globals['_MANIFEST']._serialized_start=723
-  _globals['_MANIFEST']._serialized_end=750
-  _globals['_MANAGEMENTROUTE']._serialized_start=842
-  _globals['_MANAGEMENTROUTE']._serialized_end=1085
+  _globals['_STATUS']._serialized_start=149
+  _globals['_STATUS']._serialized_end=324
+  _globals['_COMPUTEID']._serialized_start=326
+  _globals['_COMPUTEID']._serialized_end=388
+  _globals['_MEMORYID']._serialized_start=390
+  _globals['_MEMORYID']._serialized_end=450
+  _globals['_COMPUTESTATUS']._serialized_start=452
+  _globals['_COMPUTESTATUS']._serialized_end=535
+  _globals['_MEMORYSTATUS']._serialized_start=537
+  _globals['_MEMORYSTATUS']._serialized_end=615
+  _globals['_WORKERSTATUS']._serialized_start=618
+  _globals['_WORKERSTATUS']._serialized_end=802
+  _globals['_STATISTICS']._serialized_start=804
+  _globals['_STATISTICS']._serialized_end=856
+  _globals['_MANIFEST']._serialized_start=858
+  _globals['_MANIFEST']._serialized_end=885
+  _globals['_MANAGEMENTROUTE']._serialized_start=954
+  _globals['_MANAGEMENTROUTE']._serialized_end=1197
 # @@protoc_insertion_point(module_scope)
