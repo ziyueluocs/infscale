@@ -3,7 +3,7 @@ import asyncio
 
 import click
 from infscale.actor.agent import Agent
-from infscale.constants import CONTROLLER_PORT, LOCALHOST
+from infscale.constants import APISERVER_PORT, CONTROLLER_PORT, LOCALHOST
 from infscale.controller import controller as ctrl
 
 
@@ -15,10 +15,11 @@ def run():
 
 @run.command()
 @click.option("--port", default=CONTROLLER_PORT, help="port number")
-def controller(port: int):
+@click.option("--apiport", default=APISERVER_PORT, help="port number for api server")
+def controller(port: int, apiport: int):
     """Run controller."""
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(ctrl.Controller(port=port).run())
+    loop.run_until_complete(ctrl.Controller(port=port, apiport=apiport).run())
 
 
 @run.command()

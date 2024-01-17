@@ -1,12 +1,15 @@
 """Controller class."""
-
-from typing import AsyncIterable
+import asyncio
+from typing import Any, AsyncIterable
 
 import grpc
+from fastapi import Request
 from grpc.aio import ServicerContext
 from infscale import get_logger
-from infscale.constants import CONTROLLER_PORT, GRPC_MAX_MESSAGE_LENGTH
+from infscale.constants import (APISERVER_PORT, CONTROLLER_PORT,
+                                GRPC_MAX_MESSAGE_LENGTH)
 from infscale.controller.agent_context import AgentContext
+from infscale.controller.apiserver import ApiServer, ReqType
 from infscale.monitor.gpu import GpuMonitor
 from infscale.proto import management_pb2 as pb2
 from infscale.proto import management_pb2_grpc as pb2_grpc
@@ -17,11 +20,13 @@ logger = get_logger()
 class Controller:
     """Controller class manages inference services via agents."""
 
-    def __init__(self, port: int = CONTROLLER_PORT):
+    def __init__(self, port: int = CONTROLLER_PORT, apiport: int = APISERVER_PORT):
         """Initialize an instance."""
         self.port = port
 
         self.contexts: dict[str, AgentContext] = dict()
+
+        self.apiserver = ApiServer(self, apiport)
 
     async def _start_server(self):
         server_options = [
@@ -41,7 +46,9 @@ class Controller:
     async def run(self):
         """Run controller."""
         logger.info("starting controller")
-        await self._start_server()
+        _ = asyncio.create_task(self._start_server())
+
+        await self.apiserver.run()
 
     async def handle_register(self, id: str) -> tuple[bool, str]:
         """Handle registration message."""
@@ -84,6 +91,18 @@ class Controller:
         context = self.contexts[id]
         context.reset()
         del self.contexts[id]
+
+    async def handle_fastapi_request(self, type: ReqType, req: Request) -> Any:
+        """Handle fastapi request."""
+        if type == ReqType.SERVE:
+            logger.debug("got request serve")
+            return self._handle_fastapi_serve(req)
+        else:
+            logger.debug(f"unknown fastapi rquest type: {type}")
+            return None
+
+    async def _handle_fastapi_serve(self, req: Request):
+        logger.debug(f"req = {req}")
 
 
 class ControllerServicer(pb2_grpc.ManagementRouteServicer):
