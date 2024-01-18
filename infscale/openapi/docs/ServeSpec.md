@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.serve_spec import ServeSpec
+from infscale.openapi.models.serve_spec import ServeSpec
 
 # TODO update the JSON string below
 json = "{}"

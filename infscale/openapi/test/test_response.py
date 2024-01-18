@@ -15,10 +15,10 @@
 import unittest
 import datetime
 
-from openapi_client.models.validation_error import ValidationError
+from openapi.models.response import Response
 
-class TestValidationError(unittest.TestCase):
-    """ValidationError unit test stubs"""
+class TestResponse(unittest.TestCase):
+    """Response unit test stubs"""
 
     def setUp(self):
         pass
@@ -26,34 +26,26 @@ class TestValidationError(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def make_instance(self, include_optional) -> ValidationError:
-        """Test ValidationError
+    def make_instance(self, include_optional) -> Response:
+        """Test Response
             include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
-        # uncomment below to create an instance of `ValidationError`
+        # uncomment below to create an instance of `Response`
         """
-        model = ValidationError()
+        model = Response()
         if include_optional:
-            return ValidationError(
-                loc = [
-                    null
-                    ],
-                msg = '',
-                type = ''
+            return Response(
+                message = ''
             )
         else:
-            return ValidationError(
-                loc = [
-                    null
-                    ],
-                msg = '',
-                type = '',
+            return Response(
+                message = '',
         )
         """
 
-    def testValidationError(self):
-        """Test ValidationError"""
+    def testResponse(self):
+        """Test Response"""
         # inst_req_only = self.make_instance(include_optional=False)
         # inst_req_and_optional = self.make_instance(include_optional=True)
 

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 ## Example
 
 ```python
-from openapi_client.models.response import Response
+from infscale.openapi.models.response import Response
 
 # TODO update the JSON string below
 json = "{}"

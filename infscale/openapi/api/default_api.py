@@ -25,12 +25,12 @@ except ImportError:
 
 from typing import Any
 
-from openapi_client.models.response import Response
-from openapi_client.models.serve_spec import ServeSpec
+from infscale.openapi.models.response import Response
+from infscale.openapi.models.serve_spec import ServeSpec
 
-from openapi_client.api_client import ApiClient
-from openapi_client.api_response import ApiResponse
-from openapi_client.rest import RESTResponseType
+from infscale.openapi.api_client import ApiClient
+from infscale.openapi.api_response import ApiResponse
+from infscale.openapi.rest import RESTResponseType
 
 
 class DefaultApi:

@@ -1,4 +1,4 @@
-# openapi_client.DefaultApi
+# infscale.openapi.DefaultApi
 
 All URIs are relative to *http://localhost*
 
@@ -20,25 +20,25 @@ Serve a model.
 ```python
 import time
 import os
-import openapi_client
-from openapi_client.models.response import Response
-from openapi_client.models.serve_spec import ServeSpec
-from openapi_client.rest import ApiException
+import infscale.openapi
+from infscale.openapi.models.response import Response
+from infscale.openapi.models.serve_spec import ServeSpec
+from infscale.openapi.rest import ApiException
 from pprint import pprint
 
 # Defining the host is optional and defaults to http://localhost
 # See configuration.py for a list of all supported configuration parameters.
-configuration = openapi_client.Configuration(
+configuration = infscale.openapi.Configuration(
     host = "http://localhost"
 )
 
 
 # Enter a context with an instance of the API client
-with openapi_client.ApiClient(configuration) as api_client:
+with infscale.openapi.ApiClient(configuration) as api_client:
     # Create an instance of the API class
-    api_instance = openapi_client.DefaultApi(api_client)
+    api_instance = infscale.openapi.DefaultApi(api_client)
     var_self = None # object | 
-    serve_spec = openapi_client.ServeSpec() # ServeSpec | 
+    serve_spec = infscale.openapi.ServeSpec() # ServeSpec | 
 
     try:
         # Serve

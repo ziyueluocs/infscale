@@ -20,7 +20,7 @@ import json
 
 from typing import Any, ClassVar, Dict, List, Optional
 from pydantic import BaseModel
-from openapi_client.models.validation_error import ValidationError
+from infscale.openapi.models.validation_error import ValidationError
 try:
     from typing import Self
 except ImportError:

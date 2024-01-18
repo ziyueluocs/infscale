@@ -14,8 +14,8 @@
 
 
 # import models into model package
-from openapi_client.models.http_validation_error import HTTPValidationError
-from openapi_client.models.response import Response
-from openapi_client.models.serve_spec import ServeSpec
-from openapi_client.models.validation_error import ValidationError
-from openapi_client.models.validation_error_loc_inner import ValidationErrorLocInner
+from infscale.openapi.models.http_validation_error import HTTPValidationError
+from infscale.openapi.models.response import Response
+from infscale.openapi.models.serve_spec import ServeSpec
+from infscale.openapi.models.validation_error import ValidationError
+from infscale.openapi.models.validation_error_loc_inner import ValidationErrorLocInner
