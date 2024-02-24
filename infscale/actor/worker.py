@@ -1,9 +1,11 @@
 """Worker class."""
 
 from multiprocessing.connection import Connection
+from typing import Any
 
 from infscale import get_logger
 from infscale.config import parse_serve_config
+from infscale.execution.pipeline import Pipeline
 from infscale.module.dataset import HuggingFaceDataset
 from infscale.module.modelir import ModelIR
 from infscale.module.zoo import Zoo
@@ -14,7 +16,7 @@ logger = get_logger()
 class Worker:
     """Worker class."""
 
-    def __init__(self, local_rank: int, conn: Connection, spec: dict):
+    def __init__(self, local_rank: int, conn: Connection, spec: dict[str, Any]):
         """Initialize an instance."""
         self.local_rank = local_rank
         self.conn = conn
@@ -30,6 +32,8 @@ class Worker:
         """Run the worker."""
         logger.info(f"worker {self.local_rank}")
 
+        pipeline = Pipeline(self.spec, self.ir, self.dataset)
+        pipeline.run()
         # config stage
         # join communication group
         # send tensors based on the flow graph

@@ -190,7 +190,7 @@ class ServeConfig:
 
     nfaults: int = 0  # no of faults to tolerate, default: 0 (no fault tolerance)
 
-    mini_batch_size: int = 8
+    micro_batch_size: int = 8
 
     def __post_init__(self):
         """Convert stage dict into stage object."""
