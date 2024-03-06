@@ -69,12 +69,9 @@ class Router:
 
         while True:
             logger.debug("calling receiver.recv")
-            tensors, index = receiver.recv()
+            tensors, index = await receiver.recv()
             logger.debug(f"received tensor {index}")
             await self.__rx_q.put((tensors, index))
-            # FIXME: this is a temporary measure to prevent process blocking
-            #        due to dist.recv() call
-            await asyncio.sleep(3)
             logger.debug(f"put tensors {index} into __rx_q")
 
     async def _send(self, rank: int, device: torch.device):

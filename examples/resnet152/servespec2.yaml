@@ -11,6 +11,7 @@ stage:
   start: 26
   end: 51
   id: 1-0  # <stage number>-<replica number>, s: serving server
+  is_last: True
 
 flow_graph:
   s-0:

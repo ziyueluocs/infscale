@@ -25,7 +25,7 @@ SOFTWARE.
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable, Union
 
 import torch
 from infscale import get_logger
@@ -69,5 +69,6 @@ class ModelIR:
         )
 
         self.model_args = mmd.config
+        self.output_parser: Union[Callable, None] = mmd.get_output_parser()
 
         logger.debug(f"# of layers = {len(self.layers)}")

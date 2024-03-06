@@ -61,9 +61,10 @@ class Pipeline:
             spec.stage.id,
         )
 
+        output_parser = modelir.output_parser if spec.stage.is_last else None
         layers = modelir.layers[start : end + 1]
 
-        self.stage = Stage(my_id, layers)
+        self.stage = Stage(my_id, layers, output_parser=output_parser)
 
     async def _server_send(self, router: Router):
         logger.debug("start to send requests")
@@ -73,7 +74,7 @@ class Pipeline:
             if batch is None:
                 break
 
-            logger.debug(f"sending batch {seqno}, batch: {batch}")
+            logger.debug(f"sending batch {seqno}")
             # send batch to the first stage
             await router.tx_q.put((batch, seqno))
             seqno += 1
@@ -99,7 +100,7 @@ class Pipeline:
     async def _run_server(self):
         # create router
         router = Router(self.spec)
-        # router.prepare() # FIXME: see below
+        router.prepare()
 
         # TODO: we read data directly from a dataset right now.
         #       in the future, we need to take dataset from stream as well.
@@ -111,10 +112,6 @@ class Pipeline:
         recv_task = asyncio.create_task(self._server_recv(router, max_seqno))
         logger.debug("created _send_request and _recv_resp tasks")
 
-        # FIXME: afer calling prepare(), asyncio task won't be created somehow.
-        #        as a workaround, calling it is delayed until all the asyncio
-        #        tasks are created. This needs to be fixed.
-        router.prepare()
         await asyncio.gather(*[send_task, recv_task])
         logger.debug("inference serving is done")
 

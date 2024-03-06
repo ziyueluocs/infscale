@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Union
 
 import torch
 import torch.nn as nn
@@ -26,6 +26,7 @@ class Stage(nn.Module):
         stage_id: str,
         layers: list[fx.GraphModule],
         device: torch.device = torch.device("cpu"),
+        output_parser: Callable = None,
     ):
         """Initialize stage class instance."""
         super().__init__()
@@ -36,13 +37,23 @@ class Stage(nn.Module):
 
         self._init_layers()
 
+        # An output parser is only useful for the last stage.
+        # The outputs from the last stage need to be sent back to the inference
+        # server. Therefore they need to be sent back as a list of tensors.
+        # But if the output is a dictionary of tensors. This leads to comm
+        # error. Also, in the inference, other values such as loss may not be
+        # important. So, a way to manipulate the outputs is provided.
+        self._output_parser: Union[Callable, None] = output_parser
+
     def forward(self, inputs: tuple[Tensor]) -> tuple[Tensor]:
         """Run layers in the stage."""
         logger.debug(f"calling forward with inputs of type {type(inputs)}")
         for layer in self.layers:
             inputs = layer(*inputs)
 
-        return inputs
+        outputs = self._output_parser(inputs) if self._output_parser else inputs
+
+        return outputs
 
     def _init_layers(self):
         """Initialize meta layers and move them to a device."""

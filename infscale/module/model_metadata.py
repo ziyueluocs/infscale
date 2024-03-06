@@ -2,7 +2,7 @@
 import os
 from abc import abstractmethod
 from enum import Enum
-from typing import List
+from typing import Callable, List, Union
 
 from accelerate import disk_offload
 from infscale import get_logger
@@ -68,6 +68,10 @@ class BaseModelMetaData:
     def get_split_points(self) -> List[str]:
         """Abstract method to get split points."""
 
+    @abstractmethod
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Abstract method to return function to parse output."""
+
 
 class Gpt2ModelMetaData(BaseModelMetaData):
     """Gpt2 model meta data class."""
@@ -104,6 +108,10 @@ class Gpt2ModelMetaData(BaseModelMetaData):
 
         return self.split_points
 
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Return function to parse output."""
+        return None
+
 
 class BertModelMetaData(BaseModelMetaData):
     """Bert model meta data class."""
@@ -139,6 +147,10 @@ class BertModelMetaData(BaseModelMetaData):
         logger.debug(f"#hidden_layers = {self.config.num_hidden_layers}")
 
         return self.split_points
+
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Return function to parse output."""
+        return None
 
 
 class T5ModelMetaData(BaseModelMetaData):
@@ -179,6 +191,10 @@ class T5ModelMetaData(BaseModelMetaData):
 
         return self.split_points
 
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Return function to parse output."""
+        return None
+
 
 class VitModelMetaData(BaseModelMetaData):
     """Vit model meta data class."""
@@ -216,6 +232,10 @@ class VitModelMetaData(BaseModelMetaData):
         logger.debug(f"#hidden_layers = {self.config.num_hidden_layers}")
 
         return self.split_points
+
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Return function to parse output."""
+        return None
 
 
 class ResnetModelMetaData(BaseModelMetaData):
@@ -256,3 +276,11 @@ class ResnetModelMetaData(BaseModelMetaData):
         logger.debug(f"#depths = {sum(self.config.depths)}")
 
         return self.split_points
+
+    def get_output_parser(self) -> Union[Callable, None]:
+        """Return function to parse output."""
+
+        def inner(outputs):
+            return outputs["logits"]
+
+        return inner
