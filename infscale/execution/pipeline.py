@@ -13,9 +13,6 @@ from infscale.execution.world import WorldInfo
 from infscale.module.dataset import HuggingFaceDataset
 from infscale.module.modelir import ModelIR
 
-MASTER_ADDR = "127.0.0.1"
-MASTER_PORT = "29500"
-
 logger = get_logger()
 
 
@@ -43,7 +40,6 @@ class Pipeline:
         self.world_info_list: list[WorldInfo] = list()
 
         self._initialize_multiworld()
-        # self._initialize_distributed()
 
         if "s" in spec.stage.id:  # it's server
             self.dataset = dataset
@@ -84,18 +80,6 @@ class Pipeline:
                 world_info = WorldInfo(**data)
                 self.world_info_list.append(world_info)
             world_idx += 1
-
-    def _initialize_distributed(self, backend: str = "gloo"):
-        # TODO: revise the hard-coded values and configure it dynamically
-        os.environ["MASTER_ADDR"] = MASTER_ADDR
-        os.environ["MASTER_PORT"] = MASTER_PORT
-
-        # TODO: using torch.distributed is not fault-tolerant;
-        #       replace it with elatic horovod's functionality
-        rank = self.spec.rank_map[self.spec.stage.id]
-        size = len(self.spec.rank_map)
-        dist.init_process_group(backend, rank=rank, world_size=size)
-        logger.info("initializing distributed: done")
 
     def _initialize_worker(self, spec: ServeConfig, modelir: ModelIR):
         (start, end, my_id) = (
