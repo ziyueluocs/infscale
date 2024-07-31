@@ -7,26 +7,26 @@ nfaults: 1
 # to automate building flow_graph, etc.
 micro_batch_size: 8
 backend: nccl
-device: cuda:1
+device: cuda:0
 
 stage:
-  start: 0
-  end: 25
-  id: 0-0  # <stage number>-<replica number>, s: serving server
+  start: -1
+  end: -1
+  id: s-0  # <stage number>-<replica number>, s: serving server
 
 flow_graph:
   s-0:
     - addr: "127.0.0.1"
       port: 29500
-      peer: 0-0
+      peers: [0-0]
   0-0:
     - addr: "127.0.0.1"
       port: 30500
-      peer: 1-0
+      peers: [1-0]
   1-0:
     - addr: "127.0.0.1"
       port: 31500
-      peer: s-0
+      peers: [s-0]
 
 rank_map: # run worker in this rank order
   s-0: 0

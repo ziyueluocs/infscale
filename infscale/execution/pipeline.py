@@ -67,8 +67,8 @@ class Pipeline:
                 if my_id == k:
                     my_rank = 0
                     other_rank = 1
-                elif my_id == wrk_info.peer:
-                    my_rank = 1
+                elif my_id in wrk_info.peers:
+                    my_rank = wrk_info.peers.index(my_id) + 1
                     other_rank = 0
                 else:
                     continue
@@ -79,7 +79,7 @@ class Pipeline:
                 await self.world_manager.initialize_world(
                     world_name,
                     my_rank,
-                    2,
+                    len(wrk_info.peers)+1,
                     backend=self.spec.backend,
                     addr=wrk_info.addr,
                     port=wrk_info.port,

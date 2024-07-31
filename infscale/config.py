@@ -196,7 +196,7 @@ class WorkerInfo:
 
     addr: str
     port: int
-    peer: str
+    peers: list[str]
 
 
 @dataclass
