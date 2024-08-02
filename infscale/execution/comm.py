@@ -115,6 +115,10 @@ class TensorSender:
         await self._send(seqno)
         logger.debug(f"sent seqno {seqno}")
 
+    def is_broken(self) -> bool:
+        """Check if world is broken or not."""
+        return self.communicator.is_broken(self.world_name)
+
 
 class TensorReceiver:
     """TensorReceiver class."""
@@ -188,7 +192,6 @@ class TensorReceiver:
 
         recvd: list[torch.Tensor | None] = [None] * len(self.buffer)
         for idx, tensor in enumerate(self.buffer):
-            logger.debug(f"receiving tensor {idx}")
             assert torch.is_tensor(tensor)
             await self._recv(tensor)
             recvd[idx] = tensor.clone().detach()
@@ -199,3 +202,7 @@ class TensorReceiver:
         logger.debug(f"received tensors of seqno {seqno}")
 
         return tuple(recvd), seqno
+
+    def is_broken(self) -> bool:
+        """Check if world is broken or not."""
+        return self.communicator.is_broken(self.world_name)

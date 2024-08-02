@@ -17,6 +17,7 @@
 """Pipeline class."""
 
 import asyncio
+import time
 
 import torch
 import torch.distributed as dist
@@ -126,11 +127,18 @@ class Pipeline:
         """
         logger.info("start to receive responses")
         seqno = -1
+        idx = 0
+        start_time = time.perf_counter()
         while max_seqno == -1 or max_seqno != seqno:
             logger.debug("waiting for response")
             outputs, seqno = await router.rx_q.get()
             results = self._predict_fn(outputs)
             logger.info(f"response for {seqno}: {results}")
+            if idx % 100 == 0:
+                print(f"processed {idx+1} batches")
+            idx += 1
+        end_time = time.perf_counter()
+        print(f"elapsed time: {end_time - start_time}")
 
         logger.info("_server_recv task done")
 

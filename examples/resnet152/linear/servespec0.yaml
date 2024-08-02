@@ -19,17 +19,17 @@ flow_graph:
     - name: w0
       addr: "127.0.0.1"
       port: 29500
-      peers: [0-0]
+      peers: [1-0]
   0-0:
     - name: w1
       addr: "127.0.0.1"
       port: 30500
-      peers: [1-0]
+      peers: [s-0]
   1-0:
     - name: w2
       addr: "127.0.0.1"
       port: 31500
-      peers: [s-0]
+      peers: [0-0]
 
 rank_map: # run worker in this rank order
   s-0: 0

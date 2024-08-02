@@ -18,10 +18,6 @@
 import time
 from functools import wraps
 
-from infscale import get_logger
-
-logger = get_logger()
-
 
 def timeit(func):
     """Measure function execution time as decorator.
@@ -44,7 +40,7 @@ def timeit(func):
 
         wrapper.elapsed = end_time - start_time
 
-        logger.debug(f"elapsed time = {wrapper.elapsed}")
+        print(f"elapsed time = {wrapper.elapsed}")
 
         return result
 

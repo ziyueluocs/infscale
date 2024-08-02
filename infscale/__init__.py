@@ -22,9 +22,6 @@ from logging import Logger
 
 from infscale.version import VERSION as __version__  # noqa: F401
 
-logfile_prefix = os.path.join(os.getenv("HOME", "/tmp"), "infscale")
-os.makedirs(logfile_prefix, exist_ok=True)
-
 level = getattr(logging, os.getenv("INFSCALE_LOG_LEVEL", "WARNING"))
 formatter = logging.Formatter(
     "%(asctime)s | %(filename)s:%(lineno)d | %(levelname)s | %(threadName)s | %(funcName)s | %(message)s"
