@@ -127,19 +127,19 @@ class Router:
         logger.debug("created tensor receiver")
 
         while True:
-            logger.debug("calling receiver.recv")
             try:
-                tensor, index = await receiver.recv()
+                tensors, seqno = await receiver.recv()
             except Exception as e:
                 logger.warn(f"{world_info.name} error: {e}")
                 break
 
             if recv_dev != self.device:
-                tensor = tensor.to(self.device)
+                for k in tensors.keys():
+                    tensors[k] = tensors[k].to(self.device)
 
-            logger.debug(f"received tensor {index}")
-            await self.__rx_q.put((tensor, index))
-            logger.debug(f"put tensor {index} into __rx_q")
+            logger.debug(f"received tensors of seqno {seqno}")
+            await self.__rx_q.put((tensors, seqno))
+            logger.debug(f"put tensors of seqno {seqno} into __rx_q")
 
         logger.warn(f"done with recv task for {world_info.name}")
 
@@ -166,7 +166,7 @@ class Router:
 
         while True:
             try:
-                tensor, seqno = await asyncio.wait_for(tx_q.get(), QUEUE_WAIT_PERIOD)
+                tensors, seqno = await asyncio.wait_for(tx_q.get(), QUEUE_WAIT_PERIOD)
             except asyncio.TimeoutError:
                 if not sender.is_broken():
                     continue
@@ -174,15 +174,16 @@ class Router:
                 break
 
             if send_dev != self.device:
-                tensor = tensor.to(send_dev)
+                for k in tensors.keys():
+                    tensors[k] = tensors[k].to(send_dev)
 
-            logger.debug(f"got tensor {seqno} from __tx_q")
+            logger.debug(f"got tensors of seqno {seqno} from __tx_q")
             try:
-                await sender.send(tensor, seqno)
+                await sender.send(tensors, seqno)
             except Exception as e:
                 logger.warn(f"{world_info.name} error: {e}")
                 break
-            logger.debug(f"sent tensor {seqno}")
+            logger.debug(f"sent tensors of seqno {seqno}")
 
         # remove tx queue for the world
         for i, (wi, q) in enumerate(self.__tx_qs):

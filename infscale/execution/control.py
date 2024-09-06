@@ -17,14 +17,39 @@
 """Control channel class."""
 
 import asyncio
+import pickle
 from asyncio import StreamReader, StreamWriter
+from dataclasses import dataclass
+from typing import Union
 
+import torch
 from infscale import get_logger
+from torch import Tensor
 
 logger = get_logger()
 
 
-MESSAGE_SIZE = 100
+MSG_SIZE = 10000
+MSG_MODE_SEND = "send"
+MSG_MODE_ACK = "ack"
+
+
+@dataclass
+class MetaData:
+    """MetaMessage dataclass."""
+
+    shape: torch.Size
+    dtype: torch.dtype
+
+
+class ControlMessage:
+    """ControlMessage dataclass."""
+
+    def __init__(self):
+        """Initialize ControlMessage class."""
+        self.seqno: int = 0
+        self.ditto: bool = False
+        self.metas: dict[str, MetaData] = {}
 
 
 class Channel:
@@ -38,6 +63,7 @@ class Channel:
         self.port = port
 
         self.peers: dict[int, tuple[StreamReader, StreamWriter]] = {}
+        self.prev_ctrl_msg: ControlMessage = ControlMessage()
 
     async def _setup_server(self, setup_done: asyncio.Event) -> None:
         server = await asyncio.start_server(self._handle_client, self.addr, self.port)
@@ -52,7 +78,7 @@ class Channel:
             await server.serve_forever()
 
     async def _handle_client(self, reader: StreamReader, writer: StreamWriter) -> None:
-        data = await reader.read(MESSAGE_SIZE)
+        data = await reader.read(MSG_SIZE)
         message = data.decode()
         peer_rank = int(message)
 
@@ -104,25 +130,63 @@ class Channel:
 
         logger.info("channel setup is done")
 
-    async def send(self, rank: int, message: str) -> None:
+    async def send_ctrl_msg(
+        self, rank: int, tensors: dict[str, Tensor], seqno: int = 0
+    ) -> None:
         """Send control information to a receiver."""
+        assert tensors is not None, "tensors can't be none"
+
+        msg = ControlMessage()
+        msg.seqno = seqno
+        for k, tensor in tensors.items():
+            shape = tensor.shape
+            dtype = tensor.dtype
+            msg.metas[k] = MetaData(*[shape, dtype])
+
+        if self.prev_ctrl_msg.metas == msg.metas:
+            # no need to duplicate the same control infomation
+            # set ditto and send the control message
+            msg.metas = {}
+            msg.ditto = True
+        else:
+            self.prev_ctrl_msg = msg
+
+        msg_bytes = pickle.dumps(msg)
         _, writer = self.peers[rank]
-        writer.write(message.encode())
+        writer.write(msg_bytes)
         await writer.drain()
 
-    async def recv(self, rank: int) -> str:
+    async def recv_ctrl_msg(self, rank: int) -> ControlMessage:
         """Receive control information from a sender."""
         reader, _ = self.peers[rank]
-        data = await reader.read(MESSAGE_SIZE)
-        message = data.decode()
+        data_bytes = await reader.read(MSG_SIZE)
 
-        return message
+        msg: ControlMessage = pickle.loads(data_bytes)
 
-    async def sync(self, rank: int, mode="send"):
+        return msg
+
+    async def sync(
+        self,
+        rank: int,
+        mode=MSG_MODE_SEND,
+        seqno: int = 0,
+        tensors: dict[str, Tensor] = None,
+    ) -> Union[ControlMessage, None]:
         """Synchronize send/recv."""
-        if mode == "send":
-            await self.send(rank, mode)
-            _ = await self.recv(rank)
+        if mode == MSG_MODE_SEND:
+            await self.send_ctrl_msg(rank, tensors, seqno)
+
+            # wait for acknowledgment message
+            reader, _ = self.peers[rank]
+            _ = await reader.read(MSG_SIZE)
+
+            return None
         else:  # ack
-            _ = await self.recv(rank)
-            await self.send(rank, mode)
+            msg = await self.recv_ctrl_msg(rank)
+
+            # send acknowledgment message
+            _, writer = self.peers[rank]
+            writer.write(mode.encode())
+            await writer.drain()
+
+            return msg

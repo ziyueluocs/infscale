@@ -16,30 +16,8 @@
 
 """Communication module."""
 import torch
-from infscale import get_logger
-from infscale.execution.control import Channel
+from infscale.execution.control import MSG_MODE_ACK, Channel, ControlMessage
 from multiworld.communicator import WorldCommunicator
-
-# from https://github.com/SymbioticLab/Oobleck/blob/develop/oobleck/execution/utils.py#L4-L18
-ID_TO_DTYPE = [
-    torch.float32,
-    torch.float64,
-    torch.complex64,
-    torch.complex128,
-    torch.float16,
-    torch.bfloat16,
-    torch.uint8,
-    torch.int8,
-    torch.int16,
-    torch.int32,
-    torch.int64,
-    torch.bool,
-]
-
-DTYPE_TO_ID = {dtype: id_ for id_, dtype in enumerate(ID_TO_DTYPE)}
-
-
-logger = get_logger()
 
 
 class TensorSender:
@@ -60,57 +38,19 @@ class TensorSender:
         self.rank = rank  # destination's rank
         self.device = device
 
-        self.sent_tensor_meta = False
-        self.seqno = torch.tensor([0], device=self.device, dtype=torch.int64)
+    async def send(self, tensors: dict[str, torch.Tensor], seqno: int) -> None:
+        """Send tensors to destination rank.
 
-    async def _send(self, tensor: torch.Tensor) -> None:
-        # to minimize the overhead of busy-waiting by communicator's operations
-        # we coordinate send/recv via control channel
-        await self.channel.sync(self.rank)
-        await self.communicator.send(tensor, self.rank, self.world_name)
-
-    async def send(self, tensor: torch.Tensor, seqno: int) -> None:
-        """Send tensor to destination rank.
-
+        tensors: represented as dictionary where key is string and value is tensor
         seqno: the seqno of a tensor; will be used to keep track of tensors
         traversing a pipeline.
         """
+        # to minimize the overhead of busy-waiting by communicator's operations
+        # we coordinate send/recv via control channel
+        _ = await self.channel.sync(self.rank, seqno=seqno, tensors=tensors)
 
-        async def _send_tensor_meta(tensor: torch.Tensor) -> None:
-            """
-            Send meta data for tensor.
-
-            sending order of the meta data:
-            t_dim -> t_dtype -> t_shape
-            """
-            dim = len(tensor.size())
-            t_dim = torch.tensor([dim], device=self.device, dtype=torch.int64)
-
-            dtype = DTYPE_TO_ID[tensor.dtype]
-            t_dtype = torch.tensor([dtype], device=self.device, dtype=torch.int64)
-
-            shape = tensor.size()
-            t_shape = torch.tensor(shape, device=self.device, dtype=torch.int64)
-
-            # TODO: Make send asynchronous
-            await self._send(t_dim)
-            await self._send(t_dtype)
-            await self._send(t_shape)
-
-        if not self.sent_tensor_meta:
-            logger.debug("sending tensor meta data")
-            # we only send meta data once
-            await _send_tensor_meta(tensor)
-            self.sent_tensor_meta = True
-            logger.debug("done tensor meta data tx")
-
-        logger.debug("sending tensor")
-        await self._send(tensor)
-        logger.debug("sent tensor")
-
-        self.seqno[0] = seqno
-        await self._send(self.seqno)
-        logger.debug(f"sent seqno {seqno}")
+        for _, tensor in tensors.items():
+            await self.communicator.send(tensor, self.rank, self.world_name)
 
     def is_broken(self) -> bool:
         """Check if world is broken or not."""
@@ -135,61 +75,37 @@ class TensorReceiver:
         self.rank = rank  # source's rank
         self.device = device
 
-        self.buffer: torch.Tensor = None
-        self.seqno = torch.tensor([0], device=self.device, dtype=torch.int64)
+        self.buffer: dict[str, torch.Tensor] = None
 
-    async def _recv(self, tensor: torch.Tensor):
-        # to minimize the overhead of busy-waiting by communicator's operations
-        # we coordinate send/recv via control channel
-        await self.channel.sync(self.rank, mode="ack")
-        await self.communicator.recv(tensor, self.rank, self.world_name)
-
-    async def recv(self) -> tuple[torch.Tensor, int]:
-        """Receive tensor from source rank.
+    async def recv(self) -> tuple[dict[str, torch.Tensor], int]:
+        """Receive tensors from source rank.
 
         seqno: the seqno of a tensor; will be used to keep track of tensors
         traversing a pipeline
         """
+        # to minimize the overhead of busy-waiting by communicator's operations
+        # we coordinate send/recv via control channel
+        ctrl_msg: ControlMessage = await self.channel.sync(self.rank, mode=MSG_MODE_ACK)
+        if not ctrl_msg.ditto:
+            # since there is change in tensor format, reallocate buffer
+            self.buffer = {}
+            for k, v in ctrl_msg.metas.items():
+                tensor = torch.zeros(
+                    v.shape,
+                    device=self.device,
+                    dtype=v.dtype,
+                    requires_grad=False,
+                )
+                self.buffer[k] = tensor
 
-        async def _create_receive_buffer() -> torch.Tensor:
-            """Receive menta data for tensor and return allocated buffer.
+        for _, tensor in self.buffer.items():
+            await self.communicator.recv(tensor, self.rank, self.world_name)
 
-            receiving order of the meta data:
-            t_dim -> t_dtype -> t_shape
-            """
-            t_dim = torch.tensor([0], device=self.device, dtype=torch.int64)
-            await self._recv(t_dim)
-            t_dim = t_dim.item()
+        seqno = ctrl_msg.seqno
 
-            t_dtype = torch.tensor([0], device=self.device, dtype=torch.int64)
-            await self._recv(t_dtype)
-            t_dtype = ID_TO_DTYPE[t_dtype.item()]
-
-            t_shape = torch.tensor([1] * t_dim, device=self.device, dtype=torch.int64)
-            await self._recv(t_shape)
-            t_shape = t_shape.tolist()
-
-            tensor = torch.zeros(
-                t_shape,
-                device=self.device,
-                dtype=t_dtype,
-                requires_grad=False,
-            )
-
-            return tensor
-
-        if self.buffer is None:
-            logger.debug("creating a recv buffer")
-            # allocate buffer once and reuse it
-            self.buffer = await _create_receive_buffer()
-            logger.debug("done recv buffer creation")
-
-        await self._recv(self.buffer)
-        recvd = self.buffer.clone().detach()
-
-        await self._recv(self.seqno)
-        seqno = self.seqno.item()
-        logger.debug(f"received tensor of seqno {seqno}")
+        recvd = {}
+        for k, v in self.buffer.items():
+            recvd[k] = v.clone().detach()
 
         return recvd, seqno
 

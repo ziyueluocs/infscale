@@ -119,7 +119,8 @@ class HuggingFaceDataset:
             return None
 
         if self.model_group == ModelGroup.IMAGE:
-            return batch["pixel_values"].to(device)
+            batch["pixel_values"] = batch["pixel_values"].to(device)
+            return batch
         else:
             # TODO: implement this later
             raise NotImplementedError

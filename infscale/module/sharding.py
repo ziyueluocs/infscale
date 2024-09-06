@@ -159,33 +159,21 @@ def shard_model(
                 with new_graph.inserting_after(prev_node):
                     if prev_shard_id in extra_outputs:
                         outputs = extra_outputs[prev_shard_id]
-                        assert len(outputs) == 1, "must be one"
-                        outputs = env[outputs[0]]
+                        outputs = {i: env[i] for i in outputs}
                         new_graph.output(outputs)
-                        # NOTE: leave the next three lines just in case to revert the change
-                        # outputs = extra_outputs[prev_shard_id]
-                        # outputs = tuple([env[i] for i in outputs])
-                        # new_graph.output(outputs)
                     else:
-                        new_graph.output(env[prev_node.name])
-                        # NOTE: leave the next one line just in case to revert the change
-                        # new_graph.output(tuple(env[prev_node.name]))
+                        new_graph.output({prev_node.name: env[prev_node.name]})
 
                 new_graph.lint()
                 module_list.append(torch.fx.GraphModule(model, new_graph))
 
                 # Create a new graph
                 new_graph = torch.fx.Graph()
-                # Add all nodes in return of the previous graph to its input
-                node_name = env[outputs.name].name
-                pl_node = new_graph.create_node("placeholder", node_name)
-                env[node_name] = pl_node
-                # NOTE: leave the next five lines just in case to revert the change
-                # for output in outputs:
-                #     # Add all nodes in return of the previous graph to its input
-                #     node_name = env[output.name].name
-                #     pl_node = new_graph.create_node("placeholder", node_name)
-                #     env[node_name] = pl_node
+                for _, output in outputs.items():
+                    # Add all nodes in return of the previous graph to its input
+                    node_name = env[output.name].name
+                    pl_node = new_graph.create_node("placeholder", node_name)
+                    env[node_name] = pl_node
 
         # Cut is done. Add all nodes into the current graph (except for labels placeholder).
         if node.op in [

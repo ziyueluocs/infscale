@@ -233,12 +233,8 @@ class Pipeline:
             logger.debug(f"received input {seqno} from rx_q")
 
             with torch.inference_mode():
-                outputs = self.stage(inputs)
-                # if isinstance(inputs, tuple):
-                #     logger.debug(f"len(inputs) = {len(inputs)}")
-                #     outputs = self.stage(*inputs)
-                # else:
-                #     outputs = self.stage(inputs)
+                outputs = self.stage(**inputs)
+
             logger.debug("got output from stage and put output into tx_q")
             await router.tx_q.put((outputs, seqno))
             logger.debug("put output into tx_q")

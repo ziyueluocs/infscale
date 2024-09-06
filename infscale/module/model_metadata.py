@@ -316,16 +316,17 @@ class ResnetModelMetaData(BaseModelMetaData):
         """Return function to parse output."""
 
         def inner(outputs):
-            return outputs["logits"]
+            return outputs
 
         return inner
 
     def get_predict_fn(self) -> Union[Callable, None]:
         """Return function to predict."""
 
-        def inner(tensors: tuple[Tensor]) -> list[str]:
+        def inner(tensors: dict[str, Tensor]) -> list[str]:
             results = []
 
+            tensors = tensors["logits"]
             for tensor in tensors:
                 predicted_label = tensor.argmax(-1).item()
                 results.append(self.config.id2label[predicted_label])

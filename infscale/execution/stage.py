@@ -64,10 +64,10 @@ class Stage(nn.Module):
         # important. So, a way to manipulate the outputs is provided.
         self._output_parser: Union[Callable, None] = output_parser
 
-    def forward(self, inputs: tuple[Tensor]) -> tuple[Tensor]:
+    def forward(self, **inputs) -> dict[str, Tensor]:
         """Run layers in the stage."""
         for layer in self.layers:
-            inputs = layer(inputs)
+            inputs = layer(**inputs)
 
         outputs = self._output_parser(inputs) if self._output_parser else inputs
 
