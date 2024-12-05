@@ -22,10 +22,9 @@ from multiprocessing import connection
 
 import torch.multiprocessing as mp
 from infscale import get_logger
-from infscale.actor.job_msg import Message, MessageType, WorkerStatus
+from infscale.actor.job_msg import Message, MessageType, WorkerStatus, WorkerStatusMessage
 
 logger = None
-
 
 @dataclass
 class WorkerMetaData:
@@ -47,6 +46,7 @@ class WorkerManager:
         logger = get_logger()
 
         self._workers: dict[int, WorkerMetaData] = {}
+        self.status_q = asyncio.Queue()
 
     def add(
         self,
@@ -147,6 +147,10 @@ class WorkerManager:
 
     def _update_worker_status(self, message: Message, fd: int) -> None:
         """Update Worker status."""
+        wrk_id = self._workers[fd].id
+
+        _ = asyncio.create_task(self.status_q.put(WorkerStatusMessage(wrk_id, message.job_id, message.content)))
+
         self._workers[fd].status = message.content
 
     def terminate_workers(
