@@ -98,6 +98,7 @@ class Pipeline:
                 backend=backend,
                 addr=addr,
                 port=port,
+                timeout=300,
                 device=self._device,
             )
         except asyncio.CancelledError:
@@ -321,9 +322,10 @@ class Pipeline:
             count += 1
 
         end_time = time.perf_counter()
-        print(
-            f"Server recv done, Job: {self._job_id} elapsed time: {end_time - start_time}"
-        )
+        duration = end_time - start_time
+        print(f"Server recv done - Job: {self._job_id}")
+        print(f"\tElapsed time: {duration}")
+        print(f"\tThroughput: {count * self._micro_batch_size / duration}")
 
         self._set_n_send_worker_status(WorkerStatus.SERVING_DONE)
 
