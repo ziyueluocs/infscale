@@ -298,6 +298,10 @@ class FailingState(BaseJobState):
         """Return failing state enum."""
         return JobStateEnum.FAILING
 
+    async def stop(self):
+        """Transition to Stopping state."""
+        await self.context._JobContext__stop()
+
     def cond_stopped(self):
         """Handle the transition to failed."""
         if self.context.in_statuses_for_all_workers(
