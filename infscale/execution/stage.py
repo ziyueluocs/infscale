@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import gc
 import traceback
 from typing import TYPE_CHECKING, Callable, Union
 
@@ -216,7 +217,20 @@ class Stage(nn.Module):
         #       served. For now, to mitigate the issue, we lazily remove kv cache
         #       corresponding to a request whose sequence number is
         #       (seqno of the current request - (max_inflight + 5)).
-        self.caches.pop(seqno - (self.max_inflight + 5), None)
+        cache_to_release = self.caches.pop(seqno - (self.max_inflight + 5), None)
+        if cache_to_release:
+            logger.info(f"cache length: {len(self.caches)}")
+            max_mem_size = torch.cuda.max_memory_allocated(device=None) / 1024**2
+            mem_size = torch.cuda.memory_allocated(device=None) / 1024**2
+            logger.info(f"-before: gpu used max: {max_mem_size}, current: {mem_size}")
+
+            del cache_to_release
+            gc.collect()
+            torch.cuda.empty_cache()
+
+            max_mem_size = torch.cuda.max_memory_allocated(device=None) / 1024**2
+            mem_size = torch.cuda.memory_allocated(device=None) / 1024**2
+            logger.info(f"+after: gpu used max: {max_mem_size}, current: {mem_size}")
 
         if seqno not in self.caches:
             self.caches[seqno] = DynamicCache()
