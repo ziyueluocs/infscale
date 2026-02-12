@@ -92,6 +92,26 @@ def check_device_same(first_device, second_device):
 
     return first_device == second_device
 
+def map_llama_wrapper_param_name(wrapper_name: str, layer_idx: int) -> str:
+    """
+    Map manual sharder LLaMA wrapper names to full model names.
+
+    Wrapper names: layer.self_attn.q_proj.weight, embed_tokens.weight, etc.
+    Model names: model.layers.{idx}.self_attn.q_proj.weight, model.embed_tokens.weight, etc.
+    """
+    if wrapper_name.startswith("layer."):
+        param_name = wrapper_name[6:]  # remove "layer."
+        return f"model.layers.{layer_idx}.{param_name}"
+    if wrapper_name.startswith("embed_tokens"):
+        return f"model.{wrapper_name}"
+    if wrapper_name.startswith("rotary_emb"):
+        return f"model.{wrapper_name}"
+    if wrapper_name.startswith("norm"):
+        return f"model.{wrapper_name}"
+    if wrapper_name.startswith("lm_head"):
+        return wrapper_name
+    return wrapper_name
+
 # ======== Memory Profiling Utilities ========
 
 def calculate_tensor_size(tensor):
@@ -180,6 +200,7 @@ def parse_args():
 
 LM_MODELS = ["llama", "llama_70b", "bert", "t5"]
 MODEL_WITH_KV_CACHE = ["llama", "llama_70b"]
+MODEL_WITH_MANUAL_LLAMA_MAPPING = ["llama", "llama_70b"]
 
 if __name__ == '__main__':
     # ======== Initialization ========
@@ -282,10 +303,16 @@ if __name__ == '__main__':
         print(f"Initializing layer {i}")
         # Create empty layer on cpu
         layer = layer.to_empty(device=cpu_device)
+        use_manual_llama_mapping = model_type in MODEL_WITH_MANUAL_LLAMA_MAPPING
             
         # Copy parameters from full model using device transfer helper
         for name, param in layer.named_parameters():
-            full_param = full_model.get_parameter(name)
+            model_param_name = (
+                map_llama_wrapper_param_name(name, layer.layer_idx)
+                if use_manual_llama_mapping
+                else name
+            )
+            full_param = full_model.get_parameter(model_param_name)
             set_module_tensor_to_device(
                 layer,
                 name,
@@ -296,7 +323,12 @@ if __name__ == '__main__':
         
         # Copy buffers similarly
         for name, buf in layer.named_buffers():
-            full_buf = full_model.get_buffer(name)
+            model_buffer_name = (
+                map_llama_wrapper_param_name(name, layer.layer_idx)
+                if use_manual_llama_mapping
+                else name
+            )
+            full_buf = full_model.get_buffer(model_buffer_name)
             set_module_tensor_to_device(
                 layer,
                 name,
