@@ -665,32 +665,29 @@ if __name__ == '__main__':
                 num_trimmed_blocks = 1
 
                 # Base per-layer stats come from the first decoder block of the trimmed model.
-                # Keep layer 0 as-is (embedding), duplicate decoder block for layers 1..trimmed_original_layers
-                # computed_layers[0] may correspond to embedding stage; decoder block starts at index 1.
-                base_idx = 1
+                # For trimmed models with only 1 layer, use index 0
+                # (ManualSharder creates 1 wrapper per decoder layer, so trimmed model has just 1 wrapper)
+                base_idx = 0
                 base_block = computed_layers[base_idx]
 
-                # Preserve layer 0
-                layer0 = computed_layers[0].copy()
-                layer0["layer_num"] = 0
-
-                # Duplicate decoder blocks to restore original count, numbered 1..trimmed_original_layers
+                # Duplicate decoder blocks to restore original count, numbered 0..trimmed_original_layers-1
                 duplicated_blocks = []
-                for j in range(1, trimmed_original_layers + 1):
+                for j in range(trimmed_original_layers):
                     dup = base_block.copy()
                     dup["layer_num"] = j
                     duplicated_blocks.append(dup)
 
                 # Append auxiliary layers (e.g., norm, lm_head) with re-indexed layer_num after decoder blocks
+                # For single-layer trimmed models, all components are in the same wrapper, so no separate aux layers
                 aux_start = base_idx + num_trimmed_blocks
-                aux_layers = computed_layers[aux_start:]
+                aux_layers = computed_layers[aux_start:] if aux_start < len(computed_layers) else []
                 reindexed_aux = []
                 for idx, aux in enumerate(aux_layers):
                     aux_copy = aux.copy()
-                    aux_copy["layer_num"] = trimmed_original_layers + 1 + idx
+                    aux_copy["layer_num"] = trimmed_original_layers + idx
                     reindexed_aux.append(aux_copy)
 
-                profiling_data["layers"] = [layer0] + duplicated_blocks + reindexed_aux
+                profiling_data["layers"] = duplicated_blocks + reindexed_aux
             else:
                 profiling_data["layers"] = computed_layers
                 

@@ -1,0 +1,1 @@
+python trim_llama_uniform.py --model_type llama --output_dir trimmed_model --kept_layer_index 0
