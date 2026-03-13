@@ -656,38 +656,37 @@ if __name__ == '__main__':
                     layer_data["kv_cache_usage_bytes"] = int(kv_cache_usage[i])
                 computed_layers.append(layer_data)
 
-            # If profiling decode on a trimmed LLaMA model, duplicate decoder block and keep aux layers (norm, lm_head)
+            # For a trimmed 3-layer LLaMA model:
+            # computed_layers[0] = first shard (embed + decoder)
+            # computed_layers[1] = middle shard (pure decoder) -> duplicate this
+            # computed_layers[2] = last shard (decoder + norm + lm_head)
             if (
                 model_type.startswith("llama")
                 and trimmed_original_layers is not None
             ):
-                # In a LLaMA architecture, decoder blocks are first in order, followed by model.norm and lm_head.
-                num_trimmed_blocks = 1
+                if len(computed_layers) < 3:
+                    raise ValueError(
+                        f"Expected at least 3 layers in trimmed LLaMA model, got {len(computed_layers)}."
+                    )
+                if trimmed_original_layers < 3:
+                    raise ValueError(
+                        f"Expected original_num_hidden_layers >= 3 for reconstruction, got {trimmed_original_layers}."
+                    )
 
-                # Base per-layer stats come from the first decoder block of the trimmed model.
-                # For trimmed models with only 1 layer, use index 0
-                # (ManualSharder creates 1 wrapper per decoder layer, so trimmed model has just 1 wrapper)
-                base_idx = 0
-                base_block = computed_layers[base_idx]
+                first_layer = computed_layers[0].copy()
+                first_layer["layer_num"] = 0
 
-                # Duplicate decoder blocks to restore original count, numbered 0..trimmed_original_layers-1
-                duplicated_blocks = []
-                for j in range(trimmed_original_layers):
-                    dup = base_block.copy()
-                    dup["layer_num"] = j
-                    duplicated_blocks.append(dup)
+                middle_layer = computed_layers[1]
+                middle_layers = []
+                for j in range(trimmed_original_layers - 2):
+                    dup = middle_layer.copy()
+                    dup["layer_num"] = j + 1
+                    middle_layers.append(dup)
 
-                # Append auxiliary layers (e.g., norm, lm_head) with re-indexed layer_num after decoder blocks
-                # For single-layer trimmed models, all components are in the same wrapper, so no separate aux layers
-                aux_start = base_idx + num_trimmed_blocks
-                aux_layers = computed_layers[aux_start:] if aux_start < len(computed_layers) else []
-                reindexed_aux = []
-                for idx, aux in enumerate(aux_layers):
-                    aux_copy = aux.copy()
-                    aux_copy["layer_num"] = trimmed_original_layers + idx
-                    reindexed_aux.append(aux_copy)
+                last_layer = computed_layers[2].copy()
+                last_layer["layer_num"] = trimmed_original_layers - 1
 
-                profiling_data["layers"] = duplicated_blocks + reindexed_aux
+                profiling_data["layers"] = [first_layer] + middle_layers + [last_layer]
             else:
                 profiling_data["layers"] = computed_layers
                 

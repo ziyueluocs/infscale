@@ -7,11 +7,12 @@ import torch
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 
-def build_trimmed_state_dict(full_sd: dict, kept_layer_index: int) -> dict:
+def build_trimmed_state_dict(full_sd: dict, rep_layer_index: int) -> dict:
     """
     Construct a trimmed state dict containing:
     - model.embed_tokens.*
-    - model.layers.0.* (copied from model.layers.{kept_layer_index}.*)
+    - model.layers.0.*, model.layers.1.*, model.layers.2.*
+      (all copied from model.layers.{rep_layer_index}.*)
     - model.norm.*
     - lm_head.*
 
@@ -28,13 +29,14 @@ def build_trimmed_state_dict(full_sd: dict, kept_layer_index: int) -> dict:
         elif key.startswith("lm_head."):
             trimmed_sd[key] = full_sd[key]
 
-    # Map the selected uniform layer to index 0
-    src_prefix = f"model.layers.{kept_layer_index}."
-    dst_prefix = "model.layers.0."
-    for key, tensor in full_sd.items():
-        if key.startswith(src_prefix):
-            new_key = dst_prefix + key[len(src_prefix):]
-            trimmed_sd[new_key] = tensor
+    # Map the representative uniform layer to indices 0, 1, 2
+    src_prefix = f"model.layers.{rep_layer_index}."
+    for dst_idx in range(3):
+        dst_prefix = f"model.layers.{dst_idx}."
+        for key, tensor in full_sd.items():
+            if key.startswith(src_prefix):
+                new_key = dst_prefix + key[len(src_prefix):]
+                trimmed_sd[new_key] = tensor
 
     return trimmed_sd
 
@@ -47,7 +49,7 @@ def _get_decoder_layers(model):
     return backbone.layers
 
 
-def print_layers_overview(model, kept_layer_index: int) -> None:
+def print_layers_overview(model, rep_layer_index: int) -> None:
     """Print all decoder layers and a detailed view of the selected layer."""
     layers = _get_decoder_layers(model)
     print("==== Decoder layer overview ====")
@@ -55,13 +57,13 @@ def print_layers_overview(model, kept_layer_index: int) -> None:
     for idx, layer in enumerate(layers):
         num_params = sum(p.numel() for p in layer.parameters())
         child_names = [name for name, _ in layer.named_children()]
-        mark = "<-- kept" if idx == kept_layer_index else ""
+        mark = "<-- representative" if idx == rep_layer_index else ""
         print(f"[{idx}] {layer.__class__.__name__} | params={num_params:,} | submodules={child_names} {mark}")
 
-    # Detailed view for the kept layer
-    print(f"\n==== Detailed parameters for kept layer {kept_layer_index} ====")
-    kept_layer = layers[kept_layer_index]
-    for name, param in kept_layer.named_parameters():
+    # Detailed view for the representative layer
+    print(f"\n==== Detailed parameters for representative layer {rep_layer_index} ====")
+    rep_layer = layers[rep_layer_index]
+    for name, param in rep_layer.named_parameters():
         try:
             shape = tuple(param.shape)
         except Exception:
@@ -70,10 +72,9 @@ def print_layers_overview(model, kept_layer_index: int) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Trim a LLaMA model to a single uniform decoder layer.")
+    parser = argparse.ArgumentParser(description="Trim a LLaMA model to three layers: first(embed+decoder), middle(decoder), last(decoder+lm_head).")
     parser.add_argument("--model_type", type=str, default="llama", choices=["llama", "llama_70b"], help="Model family to trim (default: llama)")
     parser.add_argument("--output_dir", type=str, default="trimmed_model", help="Directory to save the trimmed model")
-    parser.add_argument("--kept_layer_index", type=int, default=0, help="Which decoder block index to keep (default: 0)")
 
     args = parser.parse_args()
 
@@ -98,17 +99,18 @@ def main():
 
     orig_layers = base_config.num_hidden_layers
     print(f"Original number of layers: {orig_layers}")
-    if args.kept_layer_index < 0 or args.kept_layer_index >= orig_layers:
-        raise ValueError(f"kept_layer_index {args.kept_layer_index} out of range [0, {orig_layers-1}]")
+    rep_layer_index = orig_layers // 2
+    print(f"Using representative decoder layer index: {rep_layer_index}")
 
-    # Print all layers and highlight the selected one
-    print_layers_overview(full_model, kept_layer_index=args.kept_layer_index)
+    # Print all layers and highlight the representative one
+    print_layers_overview(full_model, rep_layer_index=rep_layer_index)
 
     print("==== Starting to build trimmed model ====")
 
-    # Build a new config with a single layer
+    # Build a new config with three layers:
+    # first(embed+decoder), middle(decoder), last(decoder+norm+lm_head)
     new_config = copy.deepcopy(full_model.config)
-    new_config.num_hidden_layers = 1
+    new_config.num_hidden_layers = 3
     # Preserve name_or_path for downstream tokenization
     new_config.name_or_path = base_model
 
@@ -118,7 +120,7 @@ def main():
     tiny_model.eval()
 
     full_sd = full_model.state_dict()
-    trimmed_sd = build_trimmed_state_dict(full_sd, kept_layer_index=args.kept_layer_index)
+    trimmed_sd = build_trimmed_state_dict(full_sd, rep_layer_index=rep_layer_index)
 
     # Load with non-strict to ignore generated buffers (like rotary emb) not present in trimmed_sd
     incompatible = tiny_model.load_state_dict(trimmed_sd, strict=False)
@@ -143,9 +145,9 @@ def main():
     meta = {
         "base_model": base_model,
         "original_num_hidden_layers": int(orig_layers),
-        "kept_layer_index": int(args.kept_layer_index),
+        "rep_layer_index": int(rep_layer_index),
         "uniform_layers_path": "model.layers",
-        "note": "This trimmed model contains a single decoder block. Multiply per-layer metrics by original_num_hidden_layers to approximate full-model totals.",
+        "note": "This trimmed model contains three decoder blocks: first(embed+decoder), middle(decoder), last(decoder+norm+lm_head). Reconstruct full-model profiles by duplicating the middle block.",
     }
     with open(os.path.join(args.output_dir, "trim_metadata.json"), "w") as f:
         json.dump(meta, f, indent=2)

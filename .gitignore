@@ -14,3 +14,10 @@ infscale.egg-info
 
 # yapf backup file
 yapf*.py
+
+# profile data
+profile_data
+
+# trimmed model
+trimmed_model
+trimmed_model_70b
