@@ -135,8 +135,12 @@ class Llama3ModelMetaData(BaseModelMetaData):
 
         self.eos_token_id = 128001
         if hasattr(self.config, "eos_token_id"):
-            self.eos_token_id = self.config.eos_token_id
-        logger.info(f"eos_token_id = {self.eos_token_id}")
+            eos = self.config.eos_token_id
+            self.eos_token_id = eos[0] if isinstance(eos, list) else eos
+            self.eos_token_ids = set(eos) if isinstance(eos, list) else {eos}
+        else:
+            self.eos_token_ids = {self.eos_token_id}
+        logger.info(f"eos_token_id = {self.eos_token_id}, all = {self.eos_token_ids}")
 
         self.temperature = 0.6
         if hasattr(self.config, "temperature"):
@@ -292,7 +296,7 @@ class Llama3ModelMetaData(BaseModelMetaData):
                 token_id = next_token[i, 0].item()
                 gen_tokens[i].append(token_id)
 
-                if token_id == eos_token_id or len(gen_tokens[i]) >= self.max_new_tokens:
+                if token_id in self.eos_token_ids or len(gen_tokens[i]) >= self.max_new_tokens:
                     finished[i] = True
                     if token_id != eos_token_id:
                         next_token[i, 0] = eos_token_id

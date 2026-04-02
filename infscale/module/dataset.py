@@ -260,16 +260,32 @@ class HuggingFaceDataset:
             text_column_name = "text"
         elif "prompt" in column_names:
             text_column_name = "prompt"
+        elif "question" in column_names:
+            text_column_name = "question"
         else:
-            text_column_name = column_names[0]
+            text_column_name = next(iter(column_names))
 
         if max_seq_length is None:
             max_seq_length = tokenizer.model_max_length
 
+        # check if the tokenizer of the model contains a chat template
+        has_chat_template = getattr(tokenizer, "chat_template", None) is not None
+
         def tokenize_function(examples):
+            if has_chat_template:
+                texts = [
+                    tokenizer.apply_chat_template(
+                        [{"role": "user", "content": text}],
+                        tokenize=False,
+                        add_generation_prompt=True,
+                    )
+                    for text in examples[text_column_name]
+                ]
+            else:
+                texts = examples[text_column_name]
             return tokenizer(
-                examples[text_column_name], 
-                padding=True, 
+                texts,
+                padding=True,
                 truncation=True,
                 max_length=max_seq_length,
                 return_tensors="pt"

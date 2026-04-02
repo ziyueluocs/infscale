@@ -14,3 +14,6 @@ infscale.egg-info
 
 # yapf backup file
 yapf*.py
+
+# running scripts
+scripts

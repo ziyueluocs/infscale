@@ -1,0 +1,43 @@
+---
+name: llama3_gsm8k
+model: meta-llama/Meta-Llama-3.1-8B-Instruct
+nfaults: 1
+# the following entries are for local development only
+# after development is done, they need to be revised accordingly
+# to automate building flow_graph, etc.
+micro_batch_size: 2
+fwd_policy: "static"
+job_id: "job6"
+# maximum number of requests in flight at any given point in time
+max_inflight: 1
+
+# Note: IP addresses should be agents'
+flow_graph:
+  s-0:
+    - name: w0
+      peers: [0-0]
+      addr: 164.107.112.46
+      backend: nccl
+  0-0:
+    - name: w1
+      peers: [s-0]
+      addr: 164.107.112.46
+      backend: nccl
+
+dataset: # huggingface dataset
+  path: gsm8k
+  name: "main"
+  split: test
+
+workers:
+  - id: s-0
+    device: cuda:1
+    is_server: true
+    stage:
+      start: -1
+      end: -1
+  - id: 0-0
+    device: cuda:2
+    stage:
+      start: 0
+      end: 31
