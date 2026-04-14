@@ -79,6 +79,10 @@ class Pipeline:
         self.n_inflight = 0
         self.tx_allow_evt = asyncio.Event()
         self.tx_allow_evt.set()
+        self._prompt_cache: dict[int, torch.Tensor] = {}
+        self._total_seqno: int | None = None
+        self._results_md_file = None
+        self._results_md_path: str | None = None
 
     async def _configure_multiworld(self, world_info: WorldInfo) -> None:
         (name, world_size, addr, port, backend, my_rank) = (
@@ -275,6 +279,78 @@ class Pipeline:
         self.n_inflight = 0
         self.tx_allow_evt.set()
 
+    def _cache_prompt(self, seqno: int, batch: dict[str, torch.Tensor] | None) -> None:
+        input_ids = None if batch is None else batch.get("input_ids")
+        if input_ids is None:
+            return
+
+        # Keep prompt logging off the critical path for GPU memory.
+        self._prompt_cache[seqno] = input_ids.detach().cpu().clone()
+
+    @staticmethod
+    def _format_result_text(text: str) -> str:
+        return " ".join(str(text).split())
+
+    def _init_results_markdown(self) -> None:
+        safe_job_id = self._job_id.replace("/", "_")
+        self._results_md_path = os.path.abspath(f"prompt_response_{safe_job_id}.md")
+        self._results_md_file = open(
+            self._results_md_path, "w", encoding="utf-8", buffering=1
+        )
+        self._results_md_file.write("# Prompt / Response Log\n\n")
+        self._results_md_file.write(f"- Job ID: `{self._job_id}`\n")
+        self._results_md_file.write(
+            f"- Generated At: `{time.strftime('%Y-%m-%d %H:%M:%S')}`\n\n"
+        )
+        print(f"Writing prompt/response markdown to {self._results_md_path}", flush=True)
+
+    def _append_results_markdown(
+        self, seqno: int, total_seqno: int | str, prompt: str, response: str
+    ) -> None:
+        if self._results_md_file is None:
+            return
+
+        self._results_md_file.write(f"## [{seqno}/{total_seqno}]\n\n")
+        self._results_md_file.write("**Prompt**\n\n")
+        self._results_md_file.write("```text\n")
+        self._results_md_file.write(f"{prompt}\n")
+        self._results_md_file.write("```\n\n")
+        self._results_md_file.write("**Response**\n\n")
+        self._results_md_file.write("```text\n")
+        self._results_md_file.write(f"{response}\n")
+        self._results_md_file.write("```\n\n")
+        self._results_md_file.flush()
+
+    def _close_results_markdown(self) -> None:
+        if self._results_md_file is None:
+            return
+
+        self._results_md_file.close()
+        self._results_md_file = None
+
+    def _print_prompt_response(self, seqno: int, results) -> None:
+        prompt_ids = self._prompt_cache.pop(seqno, None)
+        if prompt_ids is None or not hasattr(self.dataset, "tokenizer"):
+            return
+
+        prompts = self.dataset.tokenizer.batch_decode(
+            prompt_ids,
+            skip_special_tokens=True,
+            clean_up_tokenization_spaces=True,
+        )
+        if not isinstance(results, list):
+            results = [results]
+
+        total_seqno = self._total_seqno if self._total_seqno is not None else "?"
+        for prompt, response in zip(prompts, results):
+            prompt_text = self._format_result_text(prompt)
+            response_text = self._format_result_text(response)
+            print(f"[{seqno}/{total_seqno}] Prompt: {prompt_text}", flush=True)
+            print(f"[{seqno}/{total_seqno}] Response: {response_text}", flush=True)
+            self._append_results_markdown(
+                seqno, total_seqno, prompt_text, response_text
+            )
+
     async def _server_send(self, router: Router):
         global start_time
 
@@ -288,6 +364,7 @@ class Pipeline:
 
                 await self._wait_tx_permission()
 
+                self._cache_prompt(self._seqno, batch)
                 # send batch to the first stage
                 await router.send(self._seqno, batch, 0)
                 self._seqno += 1
@@ -314,6 +391,7 @@ class Pipeline:
             outputs, seqno = await router.recv()
             results = self._predict_fn(outputs)
             logger.info(f"response for {seqno}: {results}")
+            self._print_prompt_response(seqno, results)
 
             self._mc.update(seqno)
 
@@ -325,6 +403,7 @@ class Pipeline:
         print(
             f"Server recv done, Job: {self._job_id} elapsed time: {end_time - start_time}"
         )
+        self._close_results_markdown()
 
         self._set_n_send_worker_status(WorkerStatus.SERVING_DONE)
 
@@ -347,6 +426,12 @@ class Pipeline:
             spec.reqgen_config.params.in_memory,
             spec.reqgen_config.params.replay,
         )
+
+        replay = spec.reqgen_config.params.replay
+        n_batches = len(self.dataset.dataloader)
+        self._total_seqno = n_batches * (replay + 1) if replay >= 0 else None
+        self._prompt_cache = {}
+        self._init_results_markdown()
 
         self.req_generator = GeneratorFactory.get(spec.reqgen_config.sort)
         self.req_generator.initialize(
@@ -391,6 +476,7 @@ class Pipeline:
         status = WorkerStatus.TERMINATED
         resp = Message(MessageType.STATUS, status, self._job_id)
         self._wcomm.send(resp)
+        self._close_results_markdown()
 
         sys.stdout.flush()
         # TODO: This forcibly terminates the entire process.
@@ -430,6 +516,7 @@ class Pipeline:
                     status = WorkerStatus.DONE
                     resp = Message(MessageType.STATUS, status, self._job_id)
                     self._wcomm.send(resp)
+                    self._close_results_markdown()
 
                     sys.stdout.flush()
                     # TODO: This forcibly terminates the entire process.
