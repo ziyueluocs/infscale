@@ -114,7 +114,7 @@ def get_job_status(job_id: str):
     except InfScaleException as e:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content=str(e))
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=job_status)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=job_status.value)
 
 
 @app.post("/job", response_model=Response)
